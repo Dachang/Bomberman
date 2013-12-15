@@ -22,24 +22,28 @@ public:
 	virtual void Update(const Ogre::FrameEvent& evt);
 	int getPlayerXPos();
 	int getPlayerYPos();
-	void updatePlayerWithGrid(int gt);
+
+	void updateGridInfo(int current, int up, int down, int left, int right);
+	void updatePlayerWithGrid();
 private:
 	//member variables
 	Ogre::Real _moveSpeed;  
 	directionType _direction;  
 	Ogre::Vector3 _transVector;
-	int _isTurningVertical;
-	int _isTurningHorizontal;
-
 	int _leftToRight;
 	int _upToDown;
 	int _leftToUp;
 	int _leftToDown;
 	int _rightToUp;
 	int _rightToDown;
-
 	Ogre::Vector2 _pos;
 	Ogre::Vector2 _destinationPos;
+
+	int _currentGridType;
+	int _leftGridType;
+	int _rightGridType;
+	int _upGridType;
+	int _downGridType;
 
 	//methods
 	void playerMoveLeft();

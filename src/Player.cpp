@@ -14,9 +14,6 @@ void Player::Start(void)
 {
 	_moveSpeed = 250;
 	_direction = UP_DIRECTION;
-	_isTurningVertical = 1;
-	_isTurningHorizontal = 1;
-
 	_leftToUp = 1;
 	_leftToRight = 1;
 	_leftToDown = 1;
@@ -33,7 +30,6 @@ void Player::Update(const Ogre::FrameEvent& evt)
 	if (_Keyboard->isKeyDown(OIS::KC_RIGHT))
 	{
 		playerMoveRight();
-		//transVector.z += _isTurningHorizontal * _moveSpeed;
 		transVector.z -= _leftToRight * _moveSpeed;
 		transVector.z += _rightToUp * _moveSpeed;
 		transVector.z += _rightToDown * _moveSpeed;
@@ -41,7 +37,6 @@ void Player::Update(const Ogre::FrameEvent& evt)
 	else if (_Keyboard->isKeyDown(OIS::KC_LEFT))
 	{
 		playerMoveLeft();
-		//transVector.z -= _moveSpeed;
 		transVector.z += _leftToUp * _moveSpeed;
 		transVector.z += _leftToRight * _moveSpeed;
 		transVector.z += _leftToDown * _moveSpeed;
@@ -49,7 +44,6 @@ void Player::Update(const Ogre::FrameEvent& evt)
 	else if (_Keyboard->isKeyDown(OIS::KC_UP))
 	{
 		playerMoveUp();
-		//transVector.z -= _moveSpeed;
 		transVector.z -= _leftToUp * _moveSpeed;
 		transVector.z -= _rightToUp * _moveSpeed;
 		transVector.z += _upToDown * _moveSpeed;
@@ -57,7 +51,6 @@ void Player::Update(const Ogre::FrameEvent& evt)
 	else if (_Keyboard->isKeyDown(OIS::KC_DOWN))
 	{
 		playerMoveDown();
-		//transVector.z += _isTurningVertical * _moveSpeed;
 		transVector.z -= _leftToDown * _moveSpeed;
 		transVector.z -= _rightToDown * _moveSpeed;
 		transVector.z -= _upToDown * _moveSpeed;
@@ -108,7 +101,6 @@ void Player::playerMoveRight()
 		_leftToRight = 1;
 		_rightToDown = 0;
 		_rightToUp = 0;
-		//_isTurningHorizontal = -1;
 		break;
 	case UP_DIRECTION:
 		this->_Node->yaw(Ogre::Degree(-90));
@@ -165,7 +157,6 @@ void Player::playerMoveDown()
 		_upToDown = 1;
 		_leftToDown = 0;
 		_rightToDown = 0;
-		//_isTurningVertical = -1;
 		break;
 	case LEFT_DIRECTION:
 		this->_Node->yaw(Ogre::Degree(90));
@@ -219,14 +210,69 @@ int Player::getPlayerYPos()
 	return _pos.y;
 }
 
-void Player::updatePlayerWithGrid(int gt)
+void Player::updateGridInfo(int current, int up, int down, int left, int right)
 {
-	switch(gt)
+	_currentGridType = current;
+	_leftGridType = left;
+	_rightGridType = right;
+	_upGridType = up;
+	_downGridType = down;
+}
+
+void Player::updatePlayerWithGrid()
+{
+	switch (_currentGridType)
 	{
 	case 0:
 		break;
+	default:
+		break;
+	}
+	switch(_upGridType)
+	{
 	case 4:
-		_moveSpeed = 0;
+		if (_direction == UP_DIRECTION)
+		{
+			_moveSpeed = 0;
+		}
+		else
+			_moveSpeed = 250;
+		break;
+	default:
+		break;
+	}
+	switch(_downGridType)
+	{
+	case 4:
+		if (_direction == DOWN_DIRECTION)
+		{
+			_moveSpeed = 0;
+		}
+		else _moveSpeed = 250;
+		break;
+	default:
+		break;
+	}
+	switch(_leftGridType)
+	{
+	case 4:
+		if (_direction == LEFT_DIRECTION)
+		{
+			_moveSpeed = 0;
+		}
+		else _moveSpeed = 250;
+		break;
+	default:
+		break;
+	}
+	switch(_rightGridType)
+	{
+	case 4:
+		if (_direction == RIGHT_DIRECTION)
+		{
+			_moveSpeed = 0;
+		}
+		else _moveSpeed = 250;
 		break;
 	default:
 		break;
