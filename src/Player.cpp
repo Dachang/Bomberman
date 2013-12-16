@@ -23,7 +23,7 @@ void Player::Start(void)
 
 	_pos = START_POSITION;
 }
-void Player::Update(const Ogre::FrameEvent& evt)
+void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 {
 	Ogre::Vector3 transVector = Ogre::Vector3::ZERO;
 	//get input
@@ -62,6 +62,7 @@ void Player::Update(const Ogre::FrameEvent& evt)
 	updateAnimation(evt);
 	this->_Node->translate(transVector * evt.timeSinceLastFrame,Ogre::Node::TS_LOCAL);
 	this->_pos = convertWorldPosToGridPos(this->_Node->getPosition());
+	updatePlayerWithGrid(gameMap);
 }
 
 void Player::playerMoveLeft()
@@ -210,17 +211,19 @@ int Player::getPlayerYPos()
 	return _pos.y;
 }
 
-void Player::updateGridInfo(int current, int up, int down, int left, int right)
+directionType Player::getPlayerDirection()
 {
-	_currentGridType = current;
-	_leftGridType = left;
-	_rightGridType = right;
-	_upGridType = up;
-	_downGridType = down;
+	return _direction;
 }
 
-void Player::updatePlayerWithGrid()
+void Player::updatePlayerWithGrid(GameMap* gameMap)
 {
+	_currentGridType = gameMap->getMapTypeAtGridPos(_pos.x,_pos.y);
+	_upGridType = gameMap->getMapTypeAtGridPos(_pos.x,_pos.y-1);
+	_downGridType = gameMap->getMapTypeAtGridPos(_pos.x,_pos.y+1);
+	_leftGridType = gameMap->getMapTypeAtGridPos(_pos.x-1,_pos.y);
+	_rightGridType = gameMap->getMapTypeAtGridPos(_pos.x+1,_pos.y);
+
 	switch (_currentGridType)
 	{
 	case 0:

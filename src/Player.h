@@ -1,6 +1,7 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 #include "GameObject.h"
+#include "GameMap.h"
 
 #define START_POSITION Ogre::Vector2(20,0)
 
@@ -17,14 +18,19 @@ class Player : public GameObject
 public:
 	Player(Ogre::Entity* entity,Ogre::SceneNode* node,Ogre::SceneManager *sceneMgr,Ogre::Camera *camera,OIS::Keyboard *keyboard);
 	~Player(void);
-
+	//methods
 	virtual void Start(void);
-	virtual void Update(const Ogre::FrameEvent& evt);
+	virtual void Update(const Ogre::FrameEvent& evt,GameMap* gameMap);
 	int getPlayerXPos();
 	int getPlayerYPos();
-
-	void updateGridInfo(int current, int up, int down, int left, int right);
-	void updatePlayerWithGrid();
+	directionType getPlayerDirection();
+	void updatePlayerWithGrid(GameMap* gameMap);
+	//properties
+	gridType _currentGridType;
+	gridType _leftGridType;
+	gridType _rightGridType;
+	gridType _upGridType;
+	gridType _downGridType;
 private:
 	//member variables
 	Ogre::Real _moveSpeed;  
@@ -38,19 +44,11 @@ private:
 	int _rightToDown;
 	Ogre::Vector2 _pos;
 	Ogre::Vector2 _destinationPos;
-
-	int _currentGridType;
-	int _leftGridType;
-	int _rightGridType;
-	int _upGridType;
-	int _downGridType;
-
-	//methods
+	//class methods
 	void playerMoveLeft();
 	void playerMoveRight();
 	void playerMoveUp();
 	void playerMoveDown();
-
 	Ogre::Vector2 convertWorldPosToGridPos(Ogre::Vector3 pos);
 	void updateAnimation(const Ogre::FrameEvent& evt);
 };
