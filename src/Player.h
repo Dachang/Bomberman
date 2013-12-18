@@ -2,6 +2,7 @@
 #define __PLAYER_H__
 #include "GameObject.h"
 #include "GameMap.h"
+#include "GameBomb.h"
 
 #define START_POSITION Ogre::Vector2(20,0)
 
@@ -44,6 +45,8 @@ private:
 	int _rightToDown;
 	Ogre::Vector2 _pos;
 	Ogre::Vector2 _destinationPos;
+	int _bombAvailableNumber;
+	bool _playerIsPlacingBomb;
 	//class methods
 	void playerMoveLeft();
 	void playerMoveRight();

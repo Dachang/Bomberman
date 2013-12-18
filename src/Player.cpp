@@ -22,11 +22,47 @@ void Player::Start(void)
 	_upToDown = 1;
 
 	_pos = START_POSITION;
+	_bombAvailableNumber = 3;
+	_playerIsPlacingBomb = false;
 }
 void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 {
 	Ogre::Vector3 transVector = Ogre::Vector3::ZERO;
 	//get input
+	if (_Keyboard->isKeyDown(OIS::KC_SPACE))
+	{
+		if (!_playerIsPlacingBomb)
+		{
+			if (_bombAvailableNumber > 0)
+			{
+				switch(_direction)
+				{
+				case LEFT_DIRECTION:
+					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x+1,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
+					break;
+				case RIGHT_DIRECTION:
+					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x-1,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
+					break;
+				case UP_DIRECTION:
+					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y+1,GRID_BOMB);
+					break;
+				case DOWN_DIRECTION:
+					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y-1,GRID_BOMB);
+					break;
+				default:
+					break;
+				}
+				_bombAvailableNumber--;
+			}
+			_playerIsPlacingBomb = true;
+		}
+	}
+	else
+	{
+		_playerIsPlacingBomb = false;
+	}
+
+
 	if (_Keyboard->isKeyDown(OIS::KC_RIGHT))
 	{
 		playerMoveRight();
@@ -55,9 +91,7 @@ void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		transVector.z -= _rightToDown * _moveSpeed;
 		transVector.z -= _upToDown * _moveSpeed;
 	}
-	else if (_Keyboard->isKeyDown(OIS::KC_SPACE))
-	{
-	}
+
 	//update
 	updateAnimation(evt);
 	this->_Node->translate(transVector * evt.timeSinceLastFrame,Ogre::Node::TS_LOCAL);
