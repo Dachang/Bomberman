@@ -13,24 +13,29 @@ GameBomb::~GameBomb(void)
 
 void GameBomb::Start(void)
 {
-	timeToExplode = 5.0;
+	_timeToExplode = 5.0;
 }
 
-void GameBomb::Update(const Ogre::FrameEvent& evt)
+void GameBomb::Update(const Ogre::FrameEvent& evt,GameMap* map)
 {
 	countDown(evt);
-	if (timeToExplode <= 0)
+	if (_timeToExplode <= 0)
 	{
-		explode();
+		explode(map);
 	}
+}
+
+void GameBomb::setPosition(Ogre::Vector2 pos)
+{
+	_bombPosition = pos;
 }
 
 void GameBomb::countDown(const Ogre::FrameEvent& evt)
 {
-	timeToExplode -= evt.timeSinceLastFrame;
+	_timeToExplode -= evt.timeSinceLastFrame;
 }
 
-void GameBomb::explode()
+void GameBomb::explode(GameMap* map)
 {
-
+	map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y,GRID_NORMAL);
 }

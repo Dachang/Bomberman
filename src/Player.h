@@ -47,6 +47,8 @@ private:
 	Ogre::Vector2 _destinationPos;
 	int _bombAvailableNumber;
 	bool _playerIsPlacingBomb;
+	int _bombIndex;
+	std::map<int,GameBomb*> _bombList;
 	//class methods
 	void playerMoveLeft();
 	void playerMoveRight();
@@ -54,5 +56,6 @@ private:
 	void playerMoveDown();
 	Ogre::Vector2 convertWorldPosToGridPos(Ogre::Vector3 pos);
 	void updateAnimation(const Ogre::FrameEvent& evt);
+	void updateBomb(const Ogre::FrameEvent& evt,GameMap* gameMap);
 };
 #endif

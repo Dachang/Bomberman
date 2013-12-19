@@ -35,23 +35,30 @@ void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		{
 			if (_bombAvailableNumber > 0)
 			{
+				GameBomb* bomb = new GameBomb(_Entity,_Node,_SceneMgr,_Camera,_Keyboard);
 				switch(_direction)
 				{
 				case LEFT_DIRECTION:
 					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x+1,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
+					bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x+1,convertWorldPosToGridPos(_Node->getPosition()).y));
 					break;
 				case RIGHT_DIRECTION:
 					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x-1,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
+					bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x-1,convertWorldPosToGridPos(_Node->getPosition()).y));
 					break;
 				case UP_DIRECTION:
 					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y+1,GRID_BOMB);
+					bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y+1));
 					break;
 				case DOWN_DIRECTION:
 					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y-1,GRID_BOMB);
+					bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y-1));
 					break;
 				default:
 					break;
 				}
+				bomb->bombIndex = _bombIndex;
+				_bombList.insert(std::pair<int,GameBomb*>(_bombIndex++,bomb));
 				_bombAvailableNumber--;
 			}
 			_playerIsPlacingBomb = true;
@@ -97,6 +104,7 @@ void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 	this->_Node->translate(transVector * evt.timeSinceLastFrame,Ogre::Node::TS_LOCAL);
 	this->_pos = convertWorldPosToGridPos(this->_Node->getPosition());
 	updatePlayerWithGrid(gameMap);
+	updateBomb(evt,gameMap);
 }
 
 void Player::playerMoveLeft()
@@ -313,5 +321,14 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 		break;
 	default:
 		break;
+	}
+}
+
+void Player::updateBomb(const Ogre::FrameEvent& evt,GameMap* gameMap)
+{
+	for (std::map<int,GameBomb*>::iterator iter = _bombList.begin();iter != _bombList.end();)
+	{
+		iter->second->Update(evt,gameMap);
+		iter++;
 	}
 }
