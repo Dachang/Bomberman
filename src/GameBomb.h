@@ -16,8 +16,12 @@ protected:
 private:
 	Ogre::Vector2 _bombPosition;
 	float _timeToExplode;
+	float _explodeDuration;
 	void countDown(const Ogre::FrameEvent& evt);
+	void calculateDuration(const Ogre::FrameEvent& evt);
 	void explode(GameMap* map);
+	void expandPowerZone(GameMap* map);
+	void revertPowerZone(GameMap* map);
 };
 
 #endif

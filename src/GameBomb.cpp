@@ -14,6 +14,7 @@ GameBomb::~GameBomb(void)
 void GameBomb::Start(void)
 {
 	_timeToExplode = 5.0;
+	_explodeDuration = 0.5;
 }
 
 void GameBomb::Update(const Ogre::FrameEvent& evt,GameMap* map)
@@ -22,6 +23,11 @@ void GameBomb::Update(const Ogre::FrameEvent& evt,GameMap* map)
 	if (_timeToExplode <= 0)
 	{
 		explode(map);
+		calculateDuration(evt);
+		if (_explodeDuration <= 0)
+		{
+			revertPowerZone(map);
+		}
 	}
 }
 
@@ -35,7 +41,47 @@ void GameBomb::countDown(const Ogre::FrameEvent& evt)
 	_timeToExplode -= evt.timeSinceLastFrame;
 }
 
+void GameBomb::calculateDuration(const Ogre::FrameEvent& evt)
+{
+	_explodeDuration -= evt.timeSinceLastFrame;
+}
+
 void GameBomb::explode(GameMap* map)
 {
 	map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y,GRID_NORMAL);
+	expandPowerZone(map);
+}
+
+void GameBomb::expandPowerZone(GameMap* map)
+{
+	for (int i=1; i<6; i++)
+	{
+		if (_bombPosition.x - i >=0)
+		{
+			map->setMapTypeAtGridPos(_bombPosition.x - i,_bombPosition.y,GRID_BOMB_POWER);
+		}
+		if (_bombPosition.x + i < 25)
+		{
+			map->setMapTypeAtGridPos(_bombPosition.x + i,_bombPosition.y,GRID_BOMB_POWER);
+		}
+		if (_bombPosition.y - i >=0)
+		{
+			map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - i,GRID_BOMB_POWER);
+		}
+		if(_bombPosition.y + i < 20)
+		{
+			map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + i,GRID_BOMB_POWER);
+		}
+	}
+}
+
+void GameBomb::revertPowerZone(GameMap* map)
+{
+	for (int i=1; i<6; i++)
+	{
+		map->setMapTypeAtGridPos(_bombPosition.x - i,_bombPosition.y,GRID_NORMAL);
+		map->setMapTypeAtGridPos(_bombPosition.x + i,_bombPosition.y,GRID_NORMAL);
+		map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - i,GRID_NORMAL);
+		map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + i,GRID_NORMAL);
+	}
 }
