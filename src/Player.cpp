@@ -261,6 +261,7 @@ directionType Player::getPlayerDirection()
 void Player::updatePlayerWithGrid(GameMap* gameMap)
 {
 	_currentGridType = gameMap->getMapTypeAtGridPos(_pos.x,_pos.y);
+	_lastGridType = gameMap->getLastMapTypeAtGridPos(_pos.x,_pos.y);
 	_upGridType = gameMap->getMapTypeAtGridPos(_pos.x,_pos.y-1);
 	_downGridType = gameMap->getMapTypeAtGridPos(_pos.x,_pos.y+1);
 	_leftGridType = gameMap->getMapTypeAtGridPos(_pos.x-1,_pos.y);
@@ -268,14 +269,21 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 
 	switch (_currentGridType)
 	{
-	case 0:
+	case GRID_ADD_HEALTH:
+		break;
+	default:
+		break;
+	}
+	switch (_lastGridType)
+	{
+	case GRID_ADD_HEALTH:
 		break;
 	default:
 		break;
 	}
 	switch(_upGridType)
 	{
-	case 4:
+	case GRID_WALL:
 		if (_direction == UP_DIRECTION)
 		{
 			_moveSpeed = 0;
@@ -288,7 +296,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 	}
 	switch(_downGridType)
 	{
-	case 4:
+	case GRID_WALL:
 		if (_direction == DOWN_DIRECTION)
 		{
 			_moveSpeed = 0;
@@ -300,7 +308,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 	}
 	switch(_leftGridType)
 	{
-	case 4:
+	case GRID_WALL:
 		if (_direction == LEFT_DIRECTION)
 		{
 			_moveSpeed = 0;
@@ -312,7 +320,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 	}
 	switch(_rightGridType)
 	{
-	case 4:
+	case GRID_WALL:
 		if (_direction == RIGHT_DIRECTION)
 		{
 			_moveSpeed = 0;

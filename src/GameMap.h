@@ -24,11 +24,12 @@ typedef enum gridType
 typedef struct grid
 {
 	gridType typeOfGrid;
-	gridType typeOfLastGrid;
+	gridType lastTypeOfGrid;
 	Ogre::Vector3 worldPos;
 	Ogre::Vector2 gridPos;
 	Ogre::Entity* mapEntity;
 	Ogre::SceneNode* mapNode;
+	bool gridTypeIsAbleToChange;
 };
 
 class GameMap
@@ -37,6 +38,7 @@ public:
 	GameMap(Ogre::SceneManager* sceneMgr);
 	~GameMap(void);
 	gridType getMapTypeAtGridPos(int x, int y);
+	gridType getLastMapTypeAtGridPos(int x, int y);
 	void setMapTypeAtGridPos(int x, int y, gridType typeOfGrid);
 	void Update();
 protected:

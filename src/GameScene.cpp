@@ -153,6 +153,8 @@ void GameScene::Update(const Ogre::FrameEvent& evt)
 	
 	updateMapGridType();
 
+	gameMap->Update();
+
 	enemy->Update(evt,gameMap);
 
 	//if (mKeyboard->isKeyDown(OIS::KC_SPACE))
@@ -754,19 +756,19 @@ void GameScene::updateMapGridType()
 	directionType playerDirection = player->getPlayerDirection();
 	if (player->_currentGridType == GRID_NORMAL)
 	{
-		if (playerDirection == LEFT_DIRECTION)
+		if (playerDirection == LEFT_DIRECTION && player->_rightGridType != GRID_BOMB)
 		{
 			gameMap->setMapTypeAtGridPos(player->getPlayerXPos()+1,player->getPlayerYPos(),GRID_NORMAL);
 		}
-		else if (playerDirection == RIGHT_DIRECTION)
+		else if (playerDirection == RIGHT_DIRECTION && player->_leftGridType != GRID_BOMB)
 		{
 			gameMap->setMapTypeAtGridPos(player->getPlayerXPos()-1,player->getPlayerYPos(),GRID_NORMAL);
 		}
-		else if (playerDirection == UP_DIRECTION)
+		else if (playerDirection == UP_DIRECTION && player->_downGridType != GRID_BOMB)
 		{
 			gameMap->setMapTypeAtGridPos(player->getPlayerXPos(),player->getPlayerYPos()+1,GRID_NORMAL);
 		}
-		else if (playerDirection == DOWN_DIRECTION)
+		else if (playerDirection == DOWN_DIRECTION && player->_upGridType != GRID_BOMB)
 		{
 			gameMap->setMapTypeAtGridPos(player->getPlayerXPos(),player->getPlayerYPos()-1,GRID_NORMAL);
 		}

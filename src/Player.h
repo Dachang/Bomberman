@@ -28,6 +28,7 @@ public:
 	void updatePlayerWithGrid(GameMap* gameMap);
 	//properties
 	gridType _currentGridType;
+	gridType _lastGridType;
 	gridType _leftGridType;
 	gridType _rightGridType;
 	gridType _upGridType;

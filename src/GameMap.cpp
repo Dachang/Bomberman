@@ -16,11 +16,16 @@ gridType GameMap::getMapTypeAtGridPos(int x, int y)
 	return mapGrid[x][y].typeOfGrid;
 }
 
+gridType GameMap::getLastMapTypeAtGridPos(int x, int y)
+{
+	return mapGrid[x][y].lastTypeOfGrid;
+}
+
 void GameMap::setMapTypeAtGridPos(int x, int y, gridType typeOfGrid)
 {
 	gridType tempGridType = mapGrid[x][y].typeOfGrid;
 	mapGrid[x][y].typeOfGrid = typeOfGrid;
-	mapGrid[x][y].typeOfLastGrid = tempGridType;
+	mapGrid[x][y].lastTypeOfGrid = tempGridType;
 }
 
 void GameMap::Update()
@@ -29,7 +34,7 @@ void GameMap::Update()
 	{
 		for (int j=0; j<MAP_HEIGHT; ++j)
 		{
-			if (mapGrid[i][j].typeOfGrid != mapGrid[i][j].typeOfLastGrid)
+			if (mapGrid[i][j].typeOfGrid != mapGrid[i][j].lastTypeOfGrid && mapGrid[i][j].gridTypeIsAbleToChange)
 			{
 				switch(mapGrid[i][j].typeOfGrid)
 				{
@@ -47,12 +52,26 @@ void GameMap::Update()
 					mapGrid[i][j].mapNode->setPosition(0,0,0);
 					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					break;
+				case GRID_NORMAL:
+					_sceneMgr->destroySceneNode(mapGrid[i][j].mapNode);
+					mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					break;
+				case GRID_BOMB_POWER:
+					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("sphere.mesh");
+					mapGrid[i][j].mapNode->setScale(0.5,0.5,0.5);
+					mapGrid[i][j].mapNode->setPosition(0,0,0);
+					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
+					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+					mapGrid[i][j].gridTypeIsAbleToChange = true;
 					break;
 				default:
 					break;
 				}
 			}
-			mapGrid[i][j].typeOfLastGrid = mapGrid[i][j].typeOfGrid;
+			mapGrid[i][j].lastTypeOfGrid = mapGrid[i][j].typeOfGrid;
 		}
 	}
 }
@@ -72,12 +91,12 @@ void GameMap::loadMapFile()
 				if (i==0 || i==MAP_WIDTH - 1 || j==0 || j== MAP_HEIGHT - 1)
 				{
 					mapGrid[i][j].typeOfGrid = GRID_WALL;
-					mapGrid[i][j].typeOfLastGrid = GRID_WALL;
+					mapGrid[i][j].lastTypeOfGrid = GRID_WALL;
 				}
 				else
 				{
 					mapGrid[i][j].typeOfGrid = GRID_NORMAL;
-					mapGrid[i][j].typeOfLastGrid = GRID_NORMAL;
+					mapGrid[i][j].lastTypeOfGrid = GRID_NORMAL;
 				}
 
 			}
@@ -94,7 +113,7 @@ void GameMap::loadMapFile()
 				if (i==0 || i==MAP_WIDTH - 1 || j==0 || j== MAP_HEIGHT - 1)
 				{
 					mapGrid[i][j].typeOfGrid = GRID_WALL;
-					mapGrid[i][j].typeOfLastGrid = GRID_WALL;
+					mapGrid[i][j].lastTypeOfGrid = GRID_WALL;
 				}
 				else
 				{
@@ -130,6 +149,11 @@ void GameMap::generateMapAtScene()
 				mapGrid[i][j].mapNode->setPosition(0,0,0);
 				mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 				mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+				mapGrid[i][j].gridTypeIsAbleToChange = false;
+				break;
+			case GRID_NORMAL:
+				mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+				mapGrid[i][j].gridTypeIsAbleToChange = true;
 				break;
 				//其他类型的gridType，待添加
 			default:
