@@ -278,6 +278,10 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 	{
 	case GRID_ADD_HEALTH:
 		break;
+	case GRID_ADD_SPEED:
+		gameMap->setMapTypeAtGridPos(_pos.x,_pos.y,GRID_NORMAL);
+		_moveSpeed += 50;
+		break;
 	default:
 		break;
 	}

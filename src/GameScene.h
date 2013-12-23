@@ -50,15 +50,6 @@ public:
 	void createCamera(void);
 	void createScene(void);
 
-	//void askingPlayer(int playerType, int eventType);
-	//void updatePlayerPos(void);
-	//void updateNPCPlayerPos(void);
-
-	//int thromBomb(BMPlayer &player);
-	//void updateBombInfo(const Ogre::FrameEvent& evt);
-
-	//int updatePlayerInfo(const Ogre::FrameEvent& evt);
-
 	void Update(const Ogre::FrameEvent& evt);
 
 
@@ -66,16 +57,15 @@ private:
 	Player* player;
 	GameMap* gameMap;
 	EnemyAI* enemy;
+	//EnemyAI* enemy;
+	std::vector<EnemyAI*>enemyList;
 
 	int bombIndex;
 
 	Ogre::Vector3 getWorldCoord(Ogre::Vector2 pos);
-	//void movingPlayer(int playerType, float speed, Ogre::SceneNode *playerNode, Ogre::Vector3 direction, Ogre::AnimationState *animState);
-	//void calculateBombArea(Bomb &bomb);
-	//void explodeBomb(int bombIdx);
-	void addBonus(Ogre::Vector2 pos);
 
-	//void updatePlayerGridInfo();
+	void addBonus(Ogre::Vector2 pos);
+	void updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap);
 	void updateMapGridType();
 };
 

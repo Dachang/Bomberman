@@ -30,6 +30,7 @@ typedef struct grid
 	Ogre::Entity* mapEntity;
 	Ogre::SceneNode* mapNode;
 	bool gridTypeIsAbleToChange;
+	bool playerIsInTheGrid;
 };
 
 class GameMap
@@ -40,6 +41,8 @@ public:
 	gridType getMapTypeAtGridPos(int x, int y);
 	gridType getLastMapTypeAtGridPos(int x, int y);
 	void setMapTypeAtGridPos(int x, int y, gridType typeOfGrid);
+	void updateGridWithPlayerPosition(int x, int y, bool isPlayerIn);
+	bool isPlayerInTheGrid(int x, int y);
 	void Update();
 protected:
 private:

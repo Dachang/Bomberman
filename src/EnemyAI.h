@@ -8,10 +8,10 @@
 
 typedef enum EnemyDirectionType
 {
-	AI_LEFT_DIRECTION = 1,
+	AI_UP_DIRECTION=0,
 	AI_RIGHT_DIRECTION,
-	AI_UP_DIRECTION,
-	AI_DOWN_DIRECTION
+	AI_DOWN_DIRECTION,
+	AI_LEFT_DIRECTION,
 };
 
 class EnemyAI : public GameObject
@@ -24,6 +24,7 @@ public:
 	virtual void Update(const Ogre::FrameEvent& evt,GameMap* map);
 	void Transform(const Ogre::FrameEvent& evt,EnemyAIMotionType type);
 	Ogre::Vector2 convertWorldPosToGridPos(Ogre::Vector3 pos);
+	void CheckBonusCollision();
 private:
 	//member variables
 	AIBrain myBrain;
@@ -32,14 +33,12 @@ private:
 	Ogre::Vector2 myPosition;
 
 	Ogre::Real _moveSpeed;  
-	EnemyDirectionType _direction;  
+	EnemyDirectionType _direction;
+	EnemyDirectionType lastDirection;
 	Ogre::Vector3 _transVector;
 	int _isTurning;
 
 	void updateMyPosition();
-	void playerMoveLeft();
-	void playerMoveRight();
-	void playerMoveUp();
-	void playerMoveDown();
+	void Rotate();
 };
 #endif

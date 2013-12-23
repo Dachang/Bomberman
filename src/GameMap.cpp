@@ -26,6 +26,17 @@ void GameMap::setMapTypeAtGridPos(int x, int y, gridType typeOfGrid)
 	gridType tempGridType = mapGrid[x][y].typeOfGrid;
 	mapGrid[x][y].typeOfGrid = typeOfGrid;
 	mapGrid[x][y].lastTypeOfGrid = tempGridType;
+	mapGrid[x][y].playerIsInTheGrid = false;
+}
+
+void GameMap::updateGridWithPlayerPosition(int x, int y, bool isPlayerIn)
+{
+	mapGrid[x][y].playerIsInTheGrid = isPlayerIn;
+}
+
+bool GameMap::isPlayerInTheGrid(int x, int y)
+{
+	return mapGrid[x][y].playerIsInTheGrid;
 }
 
 void GameMap::Update()
@@ -44,6 +55,7 @@ void GameMap::Update()
 					mapGrid[i][j].mapNode->setPosition(0,0,0);
 					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+					mapGrid[i][j].playerIsInTheGrid = false;
 					break;
 				case GRID_BOMB:
 					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("sphere.mesh");
@@ -53,11 +65,13 @@ void GameMap::Update()
 					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
 					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					mapGrid[i][j].playerIsInTheGrid = false;
 					break;
 				case GRID_NORMAL:
 					_sceneMgr->destroySceneNode(mapGrid[i][j].mapNode);
 					mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
 					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					mapGrid[i][j].playerIsInTheGrid = false;
 					break;
 				case GRID_BOMB_POWER:
 					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("sphere.mesh");
@@ -66,6 +80,16 @@ void GameMap::Update()
 					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
 					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					mapGrid[i][j].playerIsInTheGrid = false;
+					break;
+				case GRID_ADD_SPEED:
+					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("ShaderSystem.mesh");
+					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					mapGrid[i][j].mapNode->setScale(0.5,0.5,0.5);
+					mapGrid[i][j].mapNode->setPosition(0,0,0);
+					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
+					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+					mapGrid[i][j].playerIsInTheGrid = false;
 					break;
 				default:
 					break;
@@ -92,11 +116,13 @@ void GameMap::loadMapFile()
 				{
 					mapGrid[i][j].typeOfGrid = GRID_WALL;
 					mapGrid[i][j].lastTypeOfGrid = GRID_WALL;
+					mapGrid[i][j].playerIsInTheGrid = false;
 				}
 				else
 				{
 					mapGrid[i][j].typeOfGrid = GRID_NORMAL;
 					mapGrid[i][j].lastTypeOfGrid = GRID_NORMAL;
+					mapGrid[i][j].playerIsInTheGrid = false;
 				}
 
 			}
@@ -114,11 +140,13 @@ void GameMap::loadMapFile()
 				{
 					mapGrid[i][j].typeOfGrid = GRID_WALL;
 					mapGrid[i][j].lastTypeOfGrid = GRID_WALL;
+					mapGrid[i][j].playerIsInTheGrid = false;
 				}
 				else
 				{
 					file >> tempGridData[i][j];
 					mapGrid[i][j].typeOfGrid = (gridType)tempGridData[i][j];
+					mapGrid[i][j].playerIsInTheGrid = false;
 				}
 			}
 		}
@@ -150,12 +178,30 @@ void GameMap::generateMapAtScene()
 				mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 				mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
 				mapGrid[i][j].gridTypeIsAbleToChange = false;
+				mapGrid[i][j].playerIsInTheGrid = false;
 				break;
 			case GRID_NORMAL:
 				mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
 				mapGrid[i][j].gridTypeIsAbleToChange = true;
 				break;
-				//其他类型的gridType，待添加
+			case GRID_ADD_HEALTH:
+				mapGrid[i][j].mapEntity = _sceneMgr->createEntity("tudorhouse.mesh");
+				mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+				mapGrid[i][j].gridTypeIsAbleToChange = true;
+				mapGrid[i][j].mapNode->setPosition(0,0,0);
+				mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
+				mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+				mapGrid[i][j].playerIsInTheGrid = false;
+				break;
+			case GRID_ADD_SPEED:
+				mapGrid[i][j].mapEntity = _sceneMgr->createEntity("ShaderSystem.mesh");
+				mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+				mapGrid[i][j].gridTypeIsAbleToChange = true;
+				mapGrid[i][j].mapNode->setPosition(0,0,0);
+				mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
+				mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+				mapGrid[i][j].playerIsInTheGrid = false;
+				break;
 			default:
 				break;
 			}

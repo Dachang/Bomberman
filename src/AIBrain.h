@@ -14,6 +14,14 @@
 //#include "Map.h"
 #include "EnemyAIMotionType.h"
 #include "GameMap.h"
+
+typedef enum AIMode
+{
+	AI_ATTACK=0,
+	AI_FIND,
+};
+
+
 class AIBrain
 {
 public:
@@ -26,7 +34,6 @@ private:
 	
 	EnemyAIMotionType myCurrenType;
 	EnemyAIMotionType myLastType;
-
 	GameMap* gameMap;
 	int FloodMapForPlayer[MAP_WIDTH][MAP_HEIGHT];
 	int FloodMapForBonus[MAP_WIDTH][MAP_HEIGHT];
@@ -40,14 +47,26 @@ private:
 	int playerOriginalWeight;
 	int bonusOriginalWeight;
 	int attenuationOfWeight;
+	double lastDistanceToBonus;
+	int minDistanceToPlayer;
+
+	//attack
+	AIMode motionMode;
+	int motionSeed;
+	int timeToLiveOfmotion;
 
 	void Thinking();
+	void ThinkingForMoving();
+	void ThinkingForAttacking();
+	void AttackMode();
 	double Distance(Ogre::Vector2 from,Ogre::Vector2 to);
 	void UpdateAllPosition(Ogre::Vector2 position);
 	void SetOthersPosition();
 	void FloodFillForPlayer( int x,int y,int level);
-	void traceBack(int _x, int _y);
-
+	void FloodFillForBonus( int x,int y,int level);
+	void traceBack(int _x, int _y,  const int map[MAP_WIDTH][MAP_HEIGHT],int PlayerOrBonus);
+	void DetectionForThingsUnableAcross();
+	void DetectionForDestroyableWall();
 	void ChooseType();
 	//Ogre::Vector2 GetBonusPosition();
 	Ogre::Vector2 convertWorldPosToGridPos(Ogre::Vector3 pos);
