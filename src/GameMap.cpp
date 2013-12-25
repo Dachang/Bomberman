@@ -75,17 +75,20 @@ void GameMap::Update()
 				{
 				case GRID_WALL:
 					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("cube.mesh");
+					mapGrid[i][j].mapEntity->setCastShadows(false);
 					mapGrid[i][j].mapEntity->setMaterialName("Examples/Rockwall");
 					mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+					mapGrid[i][j].mapNode->setScale(1.2,1.2,1.2);
 					mapGrid[i][j].mapNode->setPosition(0,0,0);
 					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
 					mapGrid[i][j].playerIsInTheGrid = false;
 					break;
 				case GRID_BOMB:
-					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("sphere.mesh");
+					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("bombSphere01.mesh");
+					mapGrid[i][j].mapEntity->setCastShadows(false);
 					mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
-					mapGrid[i][j].mapNode->setScale(0.5,0.5,0.5);
+					mapGrid[i][j].mapNode->setScale(100,100,100);
 					mapGrid[i][j].mapNode->setPosition(0,0,0);
 					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
@@ -103,6 +106,7 @@ void GameMap::Update()
 					break;
 				case GRID_BOMB_POWER:
 					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("sphere.mesh");
+					mapGrid[i][j].mapEntity->setCastShadows(false);
 					//mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
 					mapGrid[i][j].mapNode->setScale(0.5,0.5,0.5);
 					mapGrid[i][j].mapNode->setPosition(0,0,0);
@@ -113,6 +117,7 @@ void GameMap::Update()
 					break;
 				case GRID_ADD_SPEED:
 					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("ShaderSystem.mesh");
+					mapGrid[i][j].mapEntity->setCastShadows(false);
 					mapGrid[i][j].gridTypeIsAbleToChange = true;
 					mapGrid[i][j].mapNode->setScale(0.5,0.5,0.5);
 					mapGrid[i][j].mapNode->setPosition(0,0,0);
@@ -214,7 +219,7 @@ void GameMap::loadMapFile()
 Ogre::Vector3 GameMap::convertGridPosToWorldPos(Ogre::Vector2 pos)
 {
 	Ogre::Vector3 rtn;
-	rtn.y = 0;
+	rtn.y = 50;
 	rtn.x = MAP_GRID_SIZE * (pos.x - 12);
 	rtn.z = MAP_GRID_SIZE * (pos.y - 10);
 	return rtn;
@@ -232,8 +237,10 @@ void GameMap::generateMapAtScene()
 			{
 			case GRID_WALL:
 				mapGrid[i][j].mapEntity = _sceneMgr->createEntity("cube.mesh");
+				mapGrid[i][j].mapEntity->setCastShadows(false);
 				mapGrid[i][j].mapEntity->setMaterialName("Examples/Rockwall");
 				mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+				mapGrid[i][j].mapNode->setScale(1.2,1.2,1.2);
 				mapGrid[i][j].mapNode->setPosition(0,0,0);
 				mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 				mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
@@ -246,6 +253,7 @@ void GameMap::generateMapAtScene()
 				break;
 			case GRID_ADD_HEALTH:
 				mapGrid[i][j].mapEntity = _sceneMgr->createEntity("tudorhouse.mesh");
+				mapGrid[i][j].mapEntity->setCastShadows(false);
 				mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
 				mapGrid[i][j].gridTypeIsAbleToChange = true;
 				mapGrid[i][j].mapNode->setPosition(0,0,0);
@@ -255,6 +263,7 @@ void GameMap::generateMapAtScene()
 				break;
 			case GRID_ADD_SPEED:
 				mapGrid[i][j].mapEntity = _sceneMgr->createEntity("ShaderSystem.mesh");
+				mapGrid[i][j].mapEntity->setCastShadows(false);
 				mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
 				mapGrid[i][j].gridTypeIsAbleToChange = true;
 				mapGrid[i][j].mapNode->setPosition(0,0,0);
@@ -264,8 +273,10 @@ void GameMap::generateMapAtScene()
 				break;
 			case GRID_DISTORYABLE_WALL:
 				mapGrid[i][j].mapEntity = _sceneMgr->createEntity("cube.mesh");
+				mapGrid[i][j].mapEntity->setCastShadows(false);
 				mapGrid[i][j].mapEntity->setMaterialName("WoodPallet");
 				mapGrid[i][j].mapNode = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+				mapGrid[i][j].mapNode->setScale(1.2,1.2,1.2);
 				mapGrid[i][j].mapNode->setPosition(0,0,0);
 				mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
 				mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);

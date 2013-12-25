@@ -12,7 +12,7 @@ Player::~Player(void)
 
 void Player::Start(void)
 {
-	_healthValue = 1;
+	_healthValue = 30;
 	_moveSpeed = 250;
 	_direction = UP_DIRECTION;
 	_leftToUp = 1;
@@ -23,7 +23,7 @@ void Player::Start(void)
 	_upToDown = 1;
 
 	_pos = START_POSITION;
-	_bombAvailableNumber = 50;
+	_bombAvailableNumber = 3;
 	_bombLevel=3;
 	_playerIsPlacingBomb = false;
 }
@@ -272,6 +272,9 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 	switch (_currentGridType)
 	{
 	case GRID_ADD_HEALTH:
+		break;
+	case GRID_BOMB_POWER:
+		_healthValue--;
 		break;
 	default:
 		break;

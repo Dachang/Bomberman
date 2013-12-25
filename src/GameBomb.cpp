@@ -61,19 +61,48 @@ void GameBomb::expandPowerZone(GameMap* map)
 	{
 		if (_bombPosition.x - i >=0)
 		{
-			map->setMapTypeAtGridPos(_bombPosition.x - i,_bombPosition.y,GRID_BOMB_POWER);
+			if ((map->getMapTypeAtGridPos(_bombPosition.x-i,_bombPosition.y)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x-i,_bombPosition.y)==GRID_BOMB))
+			{
+				break;
+			}
+			else
+				map->setMapTypeAtGridPos(_bombPosition.x - i,_bombPosition.y,GRID_BOMB_POWER);
 		}
-		if (_bombPosition.x + i < 25)
+	}
+	for (int j=1; j<_bombLevel; j++)
+	{
+		if (_bombPosition.x + j < 25)
 		{
-			map->setMapTypeAtGridPos(_bombPosition.x + i,_bombPosition.y,GRID_BOMB_POWER);
+			if ((map->getMapTypeAtGridPos(_bombPosition.x+j,_bombPosition.y)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x+j,_bombPosition.y)==GRID_BOMB))
+			{
+				break;
+			}
+			else
+				map->setMapTypeAtGridPos(_bombPosition.x + j,_bombPosition.y,GRID_BOMB_POWER);
 		}
-		if (_bombPosition.y - i >=0)
+	}
+	for (int k=1; k<_bombLevel; k++)
+	{
+		if (_bombPosition.y - k >=0)
 		{
-			map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - i,GRID_BOMB_POWER);
+			if ((map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k)==GRID_BOMB))
+			{
+				break;
+			}
+			else
+				map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k,GRID_BOMB_POWER);
 		}
-		if(_bombPosition.y + i < 20)
+	}
+	for (int m=1; m<_bombLevel; m++)
+	{
+		if(_bombPosition.y + m < 20)
 		{
-			map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + i,GRID_BOMB_POWER);
+			if ((map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m)==GRID_BOMB))
+			{
+				break;
+			}
+			else
+				map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m,GRID_BOMB_POWER);
 		}
 	}
 }
@@ -82,9 +111,42 @@ void GameBomb::revertPowerZone(GameMap* map)
 {
 	for (int i=1; i<_bombLevel; i++)
 	{
-		map->setMapTypeAtGridPos(_bombPosition.x - i,_bombPosition.y,GRID_NORMAL);
-		map->setMapTypeAtGridPos(_bombPosition.x + i,_bombPosition.y,GRID_NORMAL);
-		map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - i,GRID_NORMAL);
-		map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + i,GRID_NORMAL);
+		if (_bombPosition.x - i >=0)
+		{
+			if (map->getMapTypeAtGridPos(_bombPosition.x-i,_bombPosition.y)==GRID_BOMB_POWER)
+			{
+				map->setMapTypeAtGridPos(_bombPosition.x - i,_bombPosition.y,GRID_NORMAL);
+			}
+		}
+	}
+	for (int j=1; j<_bombLevel; j++)
+	{
+		if (_bombPosition.x + j < 25)
+		{
+			if (map->getMapTypeAtGridPos(_bombPosition.x+j,_bombPosition.y)==GRID_BOMB_POWER)
+			{
+				map->setMapTypeAtGridPos(_bombPosition.x + j,_bombPosition.y,GRID_NORMAL);
+			}
+		}
+	}
+	for (int k=1; k<_bombLevel; k++)
+	{
+		if (_bombPosition.y - k >=0)
+		{
+			if (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k)==GRID_BOMB_POWER)
+			{
+				map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k,GRID_NORMAL);
+			}	
+		}
+	}
+	for (int m=1; m<_bombLevel; m++)
+	{
+		if(_bombPosition.y + m < 20)
+		{
+			if (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m)==GRID_BOMB_POWER)
+			{
+				map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m,GRID_NORMAL);
+			}
+		}
 	}
 }

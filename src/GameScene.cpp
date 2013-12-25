@@ -94,7 +94,7 @@ void GameScene::createScene(void)
 
 	//test player
 	Ogre::Entity *playerEntity = mSceneMgr->createEntity("player","ninja.mesh");
-	playerEntity->setCastShadows(true);
+	playerEntity->setCastShadows(false);
 	Ogre::SceneNode* PlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("playerNode");
 	Ogre::Vector2 testvector=Ogre::Vector2(20,5);
 	PlayerNode->setPosition(getWorldCoord( testvector));
