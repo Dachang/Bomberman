@@ -18,7 +18,11 @@ typedef enum gridType
 	GRID_ENEMY,
 	GRID_PLAYER,
 	GRID_BOMB,
-	GRID_BOMB_POWER
+	GRID_BOMB_POWER,
+	GRID_ADD_POWER,
+	GRID_REDUCE_POWER,
+	GRID_NOTHING,
+
 };
 
 typedef struct grid
@@ -43,6 +47,7 @@ public:
 	void setMapTypeAtGridPos(int x, int y, gridType typeOfGrid);
 	void updateGridWithPlayerPosition(int x, int y, bool isPlayerIn);
 	bool isPlayerInTheGrid(int x, int y);
+	int getBombNum();
 	void Update();
 protected:
 private:
@@ -52,6 +57,9 @@ private:
 	void loadMapFile();
 	Ogre::Vector3 convertGridPosToWorldPos(Ogre::Vector2 pos);
 	void generateMapAtScene();
+
+
+	int PowerMap[MAP_WIDTH][MAP_HEIGHT];
 };
 
 #endif

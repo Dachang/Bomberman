@@ -25,6 +25,7 @@ public:
 	int getPlayerXPos();
 	int getPlayerYPos();
 	directionType getPlayerDirection();
+	int getPlayerHP();
 	void updatePlayerWithGrid(GameMap* gameMap);
 	//properties
 	gridType _currentGridType;
@@ -35,6 +36,7 @@ public:
 	gridType _downGridType;
 private:
 	//member variables
+	int _healthValue;
 	Ogre::Real _moveSpeed;  
 	directionType _direction;  
 	Ogre::Vector3 _transVector;
@@ -47,6 +49,7 @@ private:
 	Ogre::Vector2 _pos;
 	Ogre::Vector2 _destinationPos;
 	int _bombAvailableNumber;
+	int _bombLevel;
 	bool _playerIsPlacingBomb;
 	int _bombIndex;
 	std::map<int,GameBomb*> _bombList;

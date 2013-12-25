@@ -1,5 +1,6 @@
 #include "AIBrain.h"
 #include <iostream>
+#include <math.h>
 #include <stack>
 #include <time.h> 
 AIBrain::AIBrain(void)
@@ -33,7 +34,7 @@ EnemyAIMotionType AIBrain::Update(EnemyAIMotionType newType,GameMap* map,Ogre::V
 
 	//think what should do
 	Thinking();
-
+	
 	//save old type
 	myLastType=myCurrenType;
 
@@ -70,8 +71,8 @@ void AIBrain::SetOthersPosition()
 		for (int y=0;y<MAP_HEIGHT;y++)
 		{
 			gridType tempType=gameMap->getMapTypeAtGridPos(x,y);
-
-			if(tempType==GRID_PLAYER)
+			bool isPlayer=gameMap->isPlayerInTheGrid(x,y);
+			if(isPlayer)
 			{
 				playerPosition.x=x;
 				playerPosition.y=y;
@@ -105,6 +106,7 @@ void AIBrain::Thinking()
 
 	//attack mode
 	if(distanceToPlayer<minDistanceToPlayer||motionMode==AI_ATTACK )
+	//if(distanceToPlayer<10||motionMode==AI_ATTACK )
 	{
 		ThinkingForAttacking();
 	}
@@ -128,7 +130,7 @@ void AIBrain::ThinkingForAttacking()
 		timeToLiveOfmotion=rand()%150;
 		if(timeToLiveOfmotion<50)
 		{
-			timeToLiveOfmotion+=200;
+			timeToLiveOfmotion+=100;
 		}
 	}
 
@@ -157,24 +159,24 @@ void AIBrain::AttackMode()
 
 	switch(motionSeed)
 	{
-	case 0:
-		myCurrenType=AI_BOMB;
-		motionSeed++;
-		break;
-	case 1:
-		WeightTable[(int)myPosition.x-1][(int)myPosition.y]+=50;
-		break;
-	case 2:
-		WeightTable[(int)myPosition.x+1][(int)myPosition.y]+=50;
-		break;
-	case 3:
-		WeightTable[(int)myPosition.x][(int)myPosition.y-1]+=50;
-		break;
-	case 4:
-		WeightTable[(int)myPosition.x][(int)myPosition.y+1]+=50;
-		break;
-	default:
-		break;
+		case 0:
+			myCurrenType=AI_BOMB;
+			motionSeed++;
+			break;
+		case 1:
+			WeightTable[(int)myPosition.x-1][(int)myPosition.y]+=50;
+			break;
+		case 2:
+			WeightTable[(int)myPosition.x+1][(int)myPosition.y]+=50;
+			break;
+		case 3:
+			WeightTable[(int)myPosition.x][(int)myPosition.y-1]+=50;
+			break;
+		case 4:
+			WeightTable[(int)myPosition.x][(int)myPosition.y+1]+=50;
+			break;
+		default:
+			break;
 
 	}
 
@@ -207,17 +209,18 @@ void AIBrain::ThinkingForMoving()
 }
 
 //flood fill 
-void AIBrain::FloodFillForPlayer(int x,int y,int level)
+ void AIBrain::FloodFillForPlayer(int x,int y,int level)
 {
 	if (x < 0 || y < 0 || x > MAP_WIDTH || y > MAP_HEIGHT){
 		return;
 	}
 
-	//if this is a wall, return
+	 //if this is a wall, return
 	//
 	//maybe add another type : bomb ...
 	//
-	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL)
+	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
+		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL)
 	{
 		FloodMapForPlayer[x][y] = -100;
 		return;
@@ -255,85 +258,269 @@ void AIBrain::FloodFillForPlayer(int x,int y,int level)
 	{
 		FloodFillForPlayer(x,y+1,level+1);
 	}
-}
 
-//flood fill 
-void AIBrain::FloodFillForBonus(int x,int y,int level)
-{
-	if (x < 0 || y < 0 || x > MAP_WIDTH || y > MAP_HEIGHT){
-		return;
-	}
-	//if this is a wall, return
-	//
-	//maybe add another type : bomb ...
-	//
-	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL)
-	{
-		FloodMapForBonus[x][y] = -100;
-		return;
-	}
 
-	FloodMapForBonus[x][y] = level;
-	if(x==bonusPosition.x&&y==bonusPosition.y)
-	{
-		//find the bonus
-		//keep the level
-		if(BonusFillLevel==0)
-		{
-			BonusFillLevel=level;
-		}
-		else
-		{
-			if(level<BonusFillLevel)
-			{
-				BonusFillLevel=level;
-			}
-		}
-	}
-	if(FloodMapForBonus[x-1][y]>=0&&(FloodMapForBonus[x-1][y]==0||FloodMapForBonus[x-1][y]>level+1))
-	{
-		FloodFillForBonus(x-1,y,level+1);
-	}
-	if(FloodMapForBonus[x][y-1]>=0&&(FloodMapForBonus[x][y-1]==0||FloodMapForBonus[x][y-1]>level+1))
-	{
-		FloodFillForBonus(x,y-1,level+1);
-	}
-	if(FloodMapForBonus[x+1][y]>=0&&(FloodMapForBonus[x+1][y]==0||FloodMapForBonus[x+1][y]>level+1))
-	{
-		FloodFillForBonus(x+1,y,level+1);
-	}
-	if(FloodMapForBonus[x][y+1]>=0&&(FloodMapForBonus[x][y+1]==0||FloodMapForBonus[x][y+1]>level+1))
-	{
-		FloodFillForBonus(x,y+1,level+1);
-	}
-}
 
-//PlayerOrBonus 0 = player
-//PlayerOrBonus 1= bonus
-void AIBrain::traceBack(int _x, int _y,const int map[MAP_WIDTH][MAP_HEIGHT],int PlayerOrBonus)
-{
-	int destinationLevel = map[_x][_y];
+	////种子
+	//Ogre::Vector2 seedPoint;
+	//seedPoint.x=x;
+	//seedPoint.y=y;
+	//std::queue<Ogre::Vector2> pointQueue;
+	////初始化
+	//pointQueue.push(seedPoint);
+
+	//int count=0;
+	//int textCount=0;
+	////当栈内无数据时停止
+	//while (!pointQueue.empty())
+	//{
+	//	int maxint=Ogre::Math::Pow(4,level-1);
+	//	if(count==0)
+	//	{
+	//		level=1;
+	//	}
+	//	else if(count< Ogre::Math::Pow(4,level-1) )
+	//	{
+
+	//	}
+	//	else if(count>= Ogre::Math::Pow(4,level-1))
+	//	{
+	//		level++;
+	//		count-=maxint;
+	//	}
+	//	count++;
+	//	textCount++;
+
+	//	Ogre::Vector2 temp = pointQueue.front();
+	//	pointQueue.pop();
+	//	if ((temp.x < 0) || (temp.x > MAP_WIDTH) || (temp.y < 0) || (temp.y> MAP_HEIGHT))
+	//		continue;
+
+	//	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
+	//		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL
+	//		||gameMap->getMapTypeAtGridPos(x,y)==GRID_BOMB)
+	//	{
+	//		FloodMapForPlayer[(int)temp.x][(int)temp.y] = -100;
+	//		continue;
+	//	}
+	//	//FloodMapForPlayer[(int)temp.x][(int)temp.y] = level;
+	//	if((int)temp.x==playerPosition.x&&(int)temp.y==playerPosition.y)
+	//	{
+	//		//find the player
+	//		//keep the level
+
+	//			if(level<FloodMapForPlayer[(int)playerPosition.x][(int)playerPosition.y])
+	//			{
+	//				FloodMapForPlayer[(int)playerPosition.x][(int)playerPosition.y] = level;
+	//			}
+	//		
+	//	}
+	//	else
+	//	{
+	//		FloodMapForPlayer[(int)temp.x][(int)temp.y] = level;
+	//	}
+
+
+	//	Ogre::Vector2 old = temp;
+	//	if(FloodMapForPlayer[(int)temp.x-1][(int)temp.y]>=0&&(FloodMapForPlayer[(int)temp.x-1][(int)temp.y]==0||FloodMapForPlayer[(int)temp.x-1][(int)temp.y]>level+1))
+	//	{
+	//		old.x--;
+	//		pointQueue.push(old);
+	//	}
+	//	if(FloodMapForPlayer[(int)temp.x][(int)temp.y-1]>=0&&(FloodMapForPlayer[(int)temp.x][(int)temp.y-1]==0||FloodMapForPlayer[(int)temp.x][(int)temp.y-1]>level+1))
+	//	{
+	//		old = temp;
+	//		old.y--;
+	//		pointQueue.push(old);
+	//	}
+	//	if(FloodMapForPlayer[(int)temp.x+1][(int)temp.y]>=0&&(FloodMapForPlayer[(int)temp.x+1][(int)temp.y]==0||FloodMapForPlayer[(int)temp.x+1][(int)temp.y]>level+1))
+	//	{
+	//		old = temp;
+	//		old.x++;
+	//		pointQueue.push(old);
+	//	}
+	//	if(FloodMapForPlayer[(int)temp.x][(int)temp.y+1]>=0&&(FloodMapForPlayer[(int)temp.x][(int)temp.y+1]==0||FloodMapForPlayer[(int)temp.x][(int)temp.y+1]>level+1))
+	//	{
+	//		old = temp;
+	//		old.y++;
+	//		pointQueue.push(old);
+	//	}
+	//}
+
+
+
+
+
+
+
+
+ }
+
+ //flood fill 
+ void AIBrain::FloodFillForBonus(int x,int y,int level)
+ {
+	 if (x < 0 || y < 0 || x > MAP_WIDTH || y > MAP_HEIGHT){
+		 return;
+	 }
+	 //if this is a wall, return
+	 //
+	 //maybe add another type : bomb ...
+	 //
+	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
+		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL)
+	 {
+		 FloodMapForBonus[x][y] = -100;
+		 return;
+	 }
+
+	 FloodMapForBonus[x][y] = level;
+	 if(x==bonusPosition.x&&y==bonusPosition.y)
+	 {
+		 //find the bonus
+		 //keep the level
+		 if(BonusFillLevel==0)
+		 {
+			 BonusFillLevel=level;
+		 }
+		 else
+		 {
+			 if(level<BonusFillLevel)
+			 {
+				 BonusFillLevel=level;
+			 }
+		 }
+	 }
+	 if(FloodMapForBonus[x-1][y]>=0&&(FloodMapForBonus[x-1][y]==0||FloodMapForBonus[x-1][y]>level+1))
+	 {
+		 FloodFillForBonus(x-1,y,level+1);
+	 }
+	 if(FloodMapForBonus[x][y-1]>=0&&(FloodMapForBonus[x][y-1]==0||FloodMapForBonus[x][y-1]>level+1))
+	 {
+		 FloodFillForBonus(x,y-1,level+1);
+	 }
+	 if(FloodMapForBonus[x+1][y]>=0&&(FloodMapForBonus[x+1][y]==0||FloodMapForBonus[x+1][y]>level+1))
+	 {
+		 FloodFillForBonus(x+1,y,level+1);
+	 }
+	 if(FloodMapForBonus[x][y+1]>=0&&(FloodMapForBonus[x][y+1]==0||FloodMapForBonus[x][y+1]>level+1))
+	 {
+		 FloodFillForBonus(x,y+1,level+1);
+	 }
+
+
+
+	 ////种子
+	 //Ogre::Vector2 seedPoint;
+	 //seedPoint.x=x;
+	 //seedPoint.y=y;
+	 //std::queue<Ogre::Vector2> pointQueue;
+	 ////初始化
+
+	 //pointQueue.push(seedPoint);
+
+	 //int count=0;
+	 //int testCount=0;
+	 ////当栈内无数据时停止
+	 //while (!pointQueue.empty())
+	 //{
+		// int maxint=Ogre::Math::Pow(4,level-1);
+		// if(count==0)
+		// {
+		//	 level=1;
+		// }
+		// else if(count< Ogre::Math::Pow(4,level-1) )
+		// {
+
+		// }
+		// else if(count>= Ogre::Math::Pow(4,level-1))
+		// {
+		//	 level++;
+		//	 count-=maxint;
+		// }
+		// count++;
+		// testCount++;
+		// Ogre::Vector2 temp = pointQueue.front();
+		// pointQueue.pop();
+		// if ((temp.x < 0) || (temp.x >= MAP_WIDTH) || (temp.y < 0) || (temp.y>= MAP_HEIGHT))
+		//	 continue;
+
+		// if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
+		//	 ||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL
+		//	 ||gameMap->getMapTypeAtGridPos(x,y)==GRID_BOMB)
+		// {
+		//	 FloodMapForBonus[(int)temp.x][(int)temp.y] = -100;
+		//	 continue;
+		// }
+		// FloodMapForBonus[(int)temp.x][(int)temp.y] = level;
+		// if((int)temp.x==bonusPosition.x&&(int)temp.y==bonusPosition.y)
+		// {
+		//	 //find the player
+		//	 //keep the level
+		//	 if(BonusFillLevel==0)
+		//	 {
+		//		 BonusFillLevel=level;
+		//	 }
+		//	 else
+		//	 {
+		//		 if(level<BonusFillLevel)
+		//		 {
+		//			 BonusFillLevel=level;
+		//		 }
+		//	 }
+		// }
+		// Ogre::Vector2 old = temp;
+		// if(FloodMapForBonus[x-1][y]>=0&&(FloodMapForBonus[x-1][y]==0))//||FloodMapForBonus[x-1][y]>level+1))
+		// {
+		//	 old.x--;
+		//	 pointQueue.push(old);
+		// }
+		// if(FloodMapForBonus[x][y-1]>=0&&(FloodMapForBonus[x][y-1]==0))//||FloodMapForBonus[x][y-1]>level+1))
+		// {
+		//	 old = temp;
+		//	 old.y--;
+		//	 pointQueue.push(old);
+		// }
+		// if(FloodMapForBonus[x+1][y]>=0&&(FloodMapForBonus[x+1][y]==0))//||FloodMapForBonus[x+1][y]>level+1))
+		// {
+		//	 old = temp;
+		//	 old.x++;
+		//	 pointQueue.push(old);
+		// }
+		// if(FloodMapForBonus[x][y+1]>=0&&(FloodMapForBonus[x][y+1]==0))//||FloodMapForBonus[x][y+1]>level+1))
+		// {
+		//	 old = temp;
+		//	 old.y++;
+		//	 pointQueue.push(old);
+		// }
+	 //}
+ }
+
+ //PlayerOrBonus 0 = player
+ //PlayerOrBonus 1= bonus
+ void AIBrain::traceBack(int _x, int _y,const int map[MAP_WIDTH][MAP_HEIGHT],int PlayerOrBonus)
+ {
+ 	int destinationLevel = map[_x][_y];
 	int temp=destinationLevel;
-	int x = _x;
-	int y = _y;
-	for (; temp >= 3; --temp){
-		if (map[x-1][y] == (temp-1)){
-			x = x-1;
-			continue;
-		}
-		if (map[x+1][y] == (temp-1)){
-			x = x+1;
-			continue;
-		}
-		if (map[x][y-1] == (temp-1)){
-			y = y-1;
-			continue;
-		}
-		if (map[x][y+1] == (temp-1)){
-			y = y+1;
-			continue;
-		}
-	}
+ 	int x = _x;
+ 	int y = _y;
+ 	for (; temp >= 3; --temp){
+ 		if (map[x-1][y] == (temp-1)){
+ 			x = x-1;
+ 			continue;
+ 		}
+ 		if (map[x+1][y] == (temp-1)){
+ 			x = x+1;
+ 			continue;
+ 		}
+ 		if (map[x][y-1] == (temp-1)){
+ 			y = y-1;
+ 			continue;
+ 		}
+ 		if (map[x][y+1] == (temp-1)){
+ 			y = y+1;
+ 			continue;
+ 		}
+ 	}
 	if(map[x][y]==2)
 	{
 		if(PlayerOrBonus==0)
@@ -345,149 +532,149 @@ void AIBrain::traceBack(int _x, int _y,const int map[MAP_WIDTH][MAP_HEIGHT],int 
 			WeightTable[x][y] +=bonusOriginalWeight - destinationLevel*attenuationOfWeight;
 		}
 	}
-}
-void AIBrain::DetectionForThingsUnableAcross()
-{
-	//met with wall or destroryable wall
-	//
-	//maybe add another type : bomb ...
-	//
-	if(gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_WALL||
-		gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_DISTORYABLE_WALL)
-	{
-		WeightTable[(int)myPosition.x-1][(int)myPosition.y]+=-100; 
-		timeToLiveOfmotion=0;
-	}
-	if(gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_WALL||
-		gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_DISTORYABLE_WALL)
-	{
-		WeightTable[(int)myPosition.x+1][(int)myPosition.y]+=-100; 
-		timeToLiveOfmotion=0;
-	}
-	if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_WALL||
-		gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_DISTORYABLE_WALL)
-	{
-		WeightTable[(int)myPosition.x][(int)myPosition.y-1]+=-100; 
-		timeToLiveOfmotion=0;
-	}
-	if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_WALL||
-		gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_DISTORYABLE_WALL)
-	{
-		WeightTable[(int)myPosition.x][(int)myPosition.y+1]+=-100; 
-		timeToLiveOfmotion=0;
-	}
+ }
+ void AIBrain::DetectionForThingsUnableAcross()
+ {
+	 //met with wall or destroryable wall
+	 //
+	 //maybe add another type : bomb ...
+	 //
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_WALL||
+		 gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_DISTORYABLE_WALL)
+	 {
+		 WeightTable[(int)myPosition.x-1][(int)myPosition.y]+=-100; 
+		 timeToLiveOfmotion=0;
+	 }
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_WALL||
+		 gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_DISTORYABLE_WALL)
+	 {
+		 WeightTable[(int)myPosition.x+1][(int)myPosition.y]+=-100; 
+		  timeToLiveOfmotion=0;
+	 }
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_WALL||
+		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_DISTORYABLE_WALL)
+	 {
+		 WeightTable[(int)myPosition.x][(int)myPosition.y-1]+=-100; 
+		  timeToLiveOfmotion=0;
+	 }
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_WALL||
+		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_DISTORYABLE_WALL)
+	 {
+		 WeightTable[(int)myPosition.x][(int)myPosition.y+1]+=-100; 
+		  timeToLiveOfmotion=0;
+	 }
 
-	//add weight in the direction without wall 
-	if(gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)!=GRID_WALL&&
-		gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)!=GRID_DISTORYABLE_WALL)
-	{
-		srand((unsigned)time(0));
-		WeightTable[(int)myPosition.x-1][(int)myPosition.y]+= (rand()&7)*1;
-	}
-	if(gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)!=GRID_WALL
-		&&gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)!=GRID_DISTORYABLE_WALL)
-	{
-		srand(2);
+	 //add weight in the direction without wall 
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)!=GRID_WALL&&
+		 gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)!=GRID_DISTORYABLE_WALL)
+	 {
+		 srand((unsigned)time(0));
+		 WeightTable[(int)myPosition.x-1][(int)myPosition.y]+= (rand()&7)*1;
+	 }
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)!=GRID_WALL
+		 &&gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)!=GRID_DISTORYABLE_WALL)
+	 {
+		 srand(2);
 		WeightTable[(int)myPosition.x+1][(int)myPosition.y]+= (rand()&7)*1;
-	}
-	if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)!=GRID_WALL&&
-		gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)!=GRID_DISTORYABLE_WALL)
-	{
-		srand(3);
+	 }
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)!=GRID_WALL&&
+		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)!=GRID_DISTORYABLE_WALL)
+	 {
+		 srand(3);
 		WeightTable[(int)myPosition.x][(int)myPosition.y-1]+= (rand()&7)*1;
-	}
-	if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)!=GRID_WALL&&
-		gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)!=GRID_DISTORYABLE_WALL)
-	{
-		srand(4);
+	 }
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)!=GRID_WALL&&
+		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)!=GRID_DISTORYABLE_WALL)
+	 {
+		 srand(4);
 		WeightTable[(int)myPosition.x][(int)myPosition.y+1]+= (rand()&4)*1;
-	}
-}
+	 }
+ }
 
-void AIBrain::DetectionForDestroyableWall()
-{
-	//if there are destroyable wall , update the state to bomb
-	if(gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_DISTORYABLE_WALL
-		||gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_DISTORYABLE_WALL
-		||gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_DISTORYABLE_WALL
-		||gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_DISTORYABLE_WALL)
-	{
-		//myCurrenType+=1;
+ void AIBrain::DetectionForDestroyableWall()
+ {
+	 //if there are destroyable wall , update the state to bomb
+	 if(gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_DISTORYABLE_WALL
+		 ||gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_DISTORYABLE_WALL
+		 ||gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_DISTORYABLE_WALL
+		 ||gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_DISTORYABLE_WALL)
+	 {
+		 //myCurrenType+=1;
 
-		switch(myCurrenType)
-		{
-		case AI_UP:
-			myCurrenType=AI_UP_AND_BOMB;
-			break;
-		case AI_RIGHT:
-			myCurrenType=AI_RIGHT_AND_BOMB;
-			break;
-		case AI_DOWN:
-			myCurrenType=AI_DOWN_AND_BOMB;
-			break;
-		case AI_LEFT:
-			myCurrenType=AI_LEFT_AND_BOMB;
-			break;
-		}
-	}
-}
+		 switch(myCurrenType)
+		 {
+			case AI_UP:
+				myCurrenType=AI_UP_AND_BOMB;
+				break;
+			case AI_RIGHT:
+				myCurrenType=AI_RIGHT_AND_BOMB;
+				break;
+			case AI_DOWN:
+				myCurrenType=AI_DOWN_AND_BOMB;
+				break;
+			case AI_LEFT:
+				myCurrenType=AI_LEFT_AND_BOMB;
+				break;
+		 }
+	 }
+ }
 
-void AIBrain::ChooseType()
-{
-	//decte
-	DetectionForThingsUnableAcross();
-	int currentWeight=0;
-	if(motionMode==AI_FIND)
-	{
-		if(WeightTable[(int)myPosition.x-1][(int)myPosition.y]>currentWeight)
-		{
-			currentWeight=WeightTable[(int)myPosition.x-1][(int)myPosition.y];
-			myCurrenType=AI_LEFT;
-		}
-		if(WeightTable[(int)myPosition.x+1][(int)myPosition.y]>currentWeight)
-		{
-			currentWeight=WeightTable[(int)myPosition.x+1][(int)myPosition.y];
-			myCurrenType=AI_RIGHT;
-		}
-		if (WeightTable[(int)myPosition.x][(int)myPosition.y-1]>currentWeight)
-		{
-			currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y-1];
-			myCurrenType=AI_UP;
-		}
-		if (WeightTable[(int)myPosition.x][(int)myPosition.y+1]>currentWeight)
-		{
-			currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y+1];
-			myCurrenType=AI_DOWN;
-		}
+ void AIBrain::ChooseType()
+ {
+	 //decte
+	 DetectionForThingsUnableAcross();
+	 int currentWeight=0;
+	 if(motionMode==AI_FIND)
+	 {
+		 if(WeightTable[(int)myPosition.x-1][(int)myPosition.y]>currentWeight)
+		 {
+			 currentWeight=WeightTable[(int)myPosition.x-1][(int)myPosition.y];
+			 myCurrenType=AI_LEFT;
+		 }
+		 if(WeightTable[(int)myPosition.x+1][(int)myPosition.y]>currentWeight)
+		 {
+			 currentWeight=WeightTable[(int)myPosition.x+1][(int)myPosition.y];
+			 myCurrenType=AI_RIGHT;
+		 }
+		 if (WeightTable[(int)myPosition.x][(int)myPosition.y-1]>currentWeight)
+		 {
+			 currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y-1];
+			 myCurrenType=AI_UP;
+		 }
+		 if (WeightTable[(int)myPosition.x][(int)myPosition.y+1]>currentWeight)
+		 {
+			 currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y+1];
+			 myCurrenType=AI_DOWN;
+		 }
 
-		//判断是否放置炸弹 破坏墙
-		DetectionForDestroyableWall();
-	}
-	else if(motionMode==AI_ATTACK)
-	{
-		currentWeight=0;
-		if(WeightTable[(int)myPosition.x-1][(int)myPosition.y]>currentWeight)
-		{
-			currentWeight=WeightTable[(int)myPosition.x-1][(int)myPosition.y];
-			myCurrenType=AI_LEFT_AND_BOMB;
-		}
-		if(WeightTable[(int)myPosition.x+1][(int)myPosition.y]>currentWeight)
-		{
-			currentWeight=WeightTable[(int)myPosition.x+1][(int)myPosition.y];
-			myCurrenType=AI_RIGHT_AND_BOMB;
-		}
-		if (WeightTable[(int)myPosition.x][(int)myPosition.y-1]>currentWeight)
-		{
-			currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y-1];
-			myCurrenType=AI_UP_AND_BOMB;
-		}
-		if (WeightTable[(int)myPosition.x][(int)myPosition.y+1]>currentWeight)
-		{
-			currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y+1];
-			myCurrenType=AI_DOWN_AND_BOMB;
-		}
-	}
-}
+		 //判断是否放置炸弹 破坏墙
+		 DetectionForDestroyableWall();
+	 }
+	 else if(motionMode==AI_ATTACK)
+	 {
+		 currentWeight=0;
+		 if(WeightTable[(int)myPosition.x-1][(int)myPosition.y]>currentWeight)
+		 {
+			 currentWeight=WeightTable[(int)myPosition.x-1][(int)myPosition.y];
+			 myCurrenType=AI_LEFT_AND_BOMB;
+		 }
+		 if(WeightTable[(int)myPosition.x+1][(int)myPosition.y]>currentWeight)
+		 {
+			 currentWeight=WeightTable[(int)myPosition.x+1][(int)myPosition.y];
+			 myCurrenType=AI_RIGHT_AND_BOMB;
+		 }
+		 if (WeightTable[(int)myPosition.x][(int)myPosition.y-1]>currentWeight)
+		 {
+			 currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y-1];
+			 myCurrenType=AI_UP_AND_BOMB;
+		 }
+		 if (WeightTable[(int)myPosition.x][(int)myPosition.y+1]>currentWeight)
+		 {
+			 currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y+1];
+			 myCurrenType=AI_DOWN_AND_BOMB;
+		 }
+	 }
+ }
 
 double AIBrain::Distance(Ogre::Vector2 from,Ogre::Vector2 to)
 {

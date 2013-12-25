@@ -12,6 +12,7 @@ Player::~Player(void)
 
 void Player::Start(void)
 {
+	_healthValue = 1;
 	_moveSpeed = 250;
 	_direction = UP_DIRECTION;
 	_leftToUp = 1;
@@ -22,7 +23,8 @@ void Player::Start(void)
 	_upToDown = 1;
 
 	_pos = START_POSITION;
-	_bombAvailableNumber = 3;
+	_bombAvailableNumber = 50;
+	_bombLevel=3;
 	_playerIsPlacingBomb = false;
 }
 void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
@@ -35,7 +37,7 @@ void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		{
 			if (_bombAvailableNumber > 0)
 			{
-				GameBomb* bomb = new GameBomb(_Entity,_Node,_SceneMgr,_Camera,_Keyboard);
+				GameBomb* bomb = new GameBomb(_Entity,_Node,_SceneMgr,_Camera,_Keyboard,_bombLevel);
 				switch(_direction)
 				{
 				case LEFT_DIRECTION:
@@ -277,10 +279,15 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 	switch (_lastGridType)
 	{
 	case GRID_ADD_HEALTH:
+		gameMap->setMapTypeAtGridPos(_pos.x,_pos.y,GRID_NORMAL);
+		_healthValue++;
 		break;
 	case GRID_ADD_SPEED:
 		gameMap->setMapTypeAtGridPos(_pos.x,_pos.y,GRID_NORMAL);
 		_moveSpeed += 50;
+		break;
+	case GRID_BOMB_POWER:
+		_healthValue--;
 		break;
 	default:
 		break;
@@ -288,6 +295,14 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 	switch(_upGridType)
 	{
 	case GRID_WALL:
+		if (_direction == UP_DIRECTION)
+		{
+			_moveSpeed = 0;
+		}
+		else
+			_moveSpeed = 250;
+		break;
+	case GRID_DISTORYABLE_WALL:
 		if (_direction == UP_DIRECTION)
 		{
 			_moveSpeed = 0;
@@ -307,6 +322,14 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 		}
 		else _moveSpeed = 250;
 		break;
+	case GRID_DISTORYABLE_WALL:
+		if (_direction == DOWN_DIRECTION)
+		{
+			_moveSpeed = 0;
+		}
+		else
+			_moveSpeed = 250;
+		break;
 	default:
 		break;
 	}
@@ -318,6 +341,14 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 			_moveSpeed = 0;
 		}
 		else _moveSpeed = 250;
+		break;
+	case GRID_DISTORYABLE_WALL:
+		if (_direction == LEFT_DIRECTION)
+		{
+			_moveSpeed = 0;
+		}
+		else
+			_moveSpeed = 250;
 		break;
 	default:
 		break;
@@ -331,16 +362,44 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 		}
 		else _moveSpeed = 250;
 		break;
+	case GRID_DISTORYABLE_WALL:
+		if (_direction == RIGHT_DIRECTION)
+		{
+			_moveSpeed = 0;
+		}
+		else
+			_moveSpeed = 250;
+		break;
 	default:
 		break;
 	}
 }
+int Player::getPlayerHP()
+{
+	return _healthValue;
+}
 
 void Player::updateBomb(const Ogre::FrameEvent& evt,GameMap* gameMap)
 {
+	if(_bombList.size()!=0)
+	{
 	for (std::map<int,GameBomb*>::iterator iter = _bombList.begin();iter != _bombList.end();)
 	{
-		iter->second->Update(evt,gameMap);
-		iter++;
+		//explode => true
+		if(iter->second->Update(evt,gameMap))
+		{
+			iter=_bombList.erase(iter);
+			_bombAvailableNumber++;
+			if(_bombList.size()==0)
+			{
+				break;
+			}
+		}
+		else
+		{
+			iter++;
+		}
+		
+	}
 	}
 }

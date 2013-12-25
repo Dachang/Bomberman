@@ -6,6 +6,7 @@ GameScene::GameScene(void)
 	NPCAnimState = NULL;
 	isSpaceKeyDown = false;
 	bombIndex = 0;
+	gameOver = false;
 }
 
 GameScene::~GameScene(void)
@@ -141,6 +142,36 @@ void GameScene::createScene(void)
 	tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
 	enemyList.push_back(tempEnemy);
 
+	/*Ogre::Entity* bonus = mSceneMgr->createEntity("bonus1","cube.mesh");
+	bonus->setCastShadows(false);
+	Ogre::SceneNode* bonusNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("bonus1");
+	bonusNode->setScale(0.7,0.7,0.7);
+	vectorPosition=Ogre::Vector2(3,15);
+	Ogre::Vector3 tempVector=getWorldCoord(vectorPosition);
+	tempVector.y+=50;
+	bonusNode->setPosition(tempVector);
+	bonusNode->attachObject(bonus);
+
+	bonus = mSceneMgr->createEntity("bonus2","cube.mesh");
+	bonus->setCastShadows(false);
+	bonusNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("bonus2");
+	bonusNode->setScale(0.7,0.7,0.7);
+	vectorPosition=Ogre::Vector2(22,3);
+	tempVector=getWorldCoord(vectorPosition);
+	tempVector.y+=50;
+	bonusNode->setPosition(tempVector);
+	bonusNode->attachObject(bonus);
+
+	bonus = mSceneMgr->createEntity("bonus3","cube.mesh");
+	bonus->setCastShadows(false);
+	bonusNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("bonus3");
+	bonusNode->setScale(0.7,0.7,0.7);
+	vectorPosition=Ogre::Vector2(20,10);
+	tempVector=getWorldCoord(vectorPosition);
+	tempVector.y+=50;
+	bonusNode->setPosition(tempVector);
+	bonusNode->attachObject(bonus);*/
+
 	//ÉèÖÃbonus
 	gameMap->setMapTypeAtGridPos(3,15,GRID_ADD_SPEED);
 	gameMap->setMapTypeAtGridPos(22,3,GRID_ADD_SPEED);
@@ -157,17 +188,17 @@ void GameScene::createScene(void)
 	l->setDiffuseColour(1.0, 1.0, 1.0);
 	l->setSpecularColour(0.5, 0.5, 0.5);
 
-
+	//terrain
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
-
 	Ogre::MeshManager::getSingleton().createPlane("ground", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 		plane, 3000, 3000, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
-
 	Ogre::Entity* entGround = mSceneMgr->createEntity("GroundEntity", "ground");
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(entGround);
-
-	entGround->setMaterialName("Examples/Rockwall");
+	entGround->setMaterialName("Examples/GrassFloor");
 	entGround->setCastShadows(false);
+
+	//sky
+	mSceneMgr->setSkyBox(true, "Examples/SceneSkyBox2", 5000, false);
 }
 void GameScene::Update(const Ogre::FrameEvent& evt)
 {
@@ -175,9 +206,11 @@ void GameScene::Update(const Ogre::FrameEvent& evt)
 	
 	updateMapGridType();
 
+	updateEnemyList(evt,gameMap);
+
 	gameMap->Update();
 
-	updateEnemyList(evt,gameMap);
+	updatePlayerLifecycle();
 }
 
 Ogre::Vector3 GameScene::getWorldCoord(Ogre::Vector2 pos)
@@ -221,33 +254,54 @@ void GameScene::updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		//*iter->Update(evt,gameMap);
 	}
 }
-
 void GameScene::updateMapGridType()
 {
-	directionType playerDirection = player->getPlayerDirection();
-	if (player->_currentGridType == GRID_NORMAL)
+	//directionType playerDirection = player->getPlayerDirection();
+	//if (player->_currentGridType == GRID_NORMAL)
+	//{
+	//	if (playerDirection == LEFT_DIRECTION && player->_rightGridType != GRID_BOMB)
+	//	{
+	//		//gameMap->setMapTypeAtGridPos(player->getPlayerXPos()+1,player->getPlayerYPos(),GRID_NORMAL);
+	//		gameMap->updateGridWithPlayerPosition(player->getPlayerXPos()+1,player->getPlayerYPos(),false);
+	//	}
+	//	else if (playerDirection == RIGHT_DIRECTION && player->_leftGridType != GRID_BOMB)
+	//	{
+	//		//gameMap->setMapTypeAtGridPos(player->getPlayerXPos()-1,player->getPlayerYPos(),GRID_NORMAL);
+	//		gameMap->updateGridWithPlayerPosition(player->getPlayerXPos()-1,player->getPlayerYPos(),false);
+	//	}
+	//	else if (playerDirection == UP_DIRECTION && player->_downGridType != GRID_BOMB)
+	//	{
+	//		//gameMap->setMapTypeAtGridPos(player->getPlayerXPos(),player->getPlayerYPos()+1,GRID_NORMAL);
+	//		gameMap->updateGridWithPlayerPosition(player->getPlayerXPos(),player->getPlayerYPos()+1,false);
+	//	}
+	//	else if (playerDirection == DOWN_DIRECTION && player->_upGridType != GRID_BOMB)
+	//	{
+	//		//gameMap->setMapTypeAtGridPos(player->getPlayerXPos(),player->getPlayerYPos()-1,GRID_NORMAL);
+	//		gameMap->updateGridWithPlayerPosition(player->getPlayerXPos(),player->getPlayerYPos()-1,false);
+	//	}
+	//}
+	//gameMap->setMapTypeAtGridPos(player->getPlayerXPos(),player->getPlayerYPos(),GRID_PLAYER);
+
+	for (int i=0; i < MAP_WIDTH; ++i)
 	{
-		if (playerDirection == LEFT_DIRECTION && player->_rightGridType != GRID_BOMB)
+		for (int j=0; j < MAP_HEIGHT; ++j)
 		{
-			gameMap->setMapTypeAtGridPos(player->getPlayerXPos()+1,player->getPlayerYPos(),GRID_NORMAL);
-			//gameMap->updateGridWithPlayerPosition(player->getPlayerXPos()+1,player->getPlayerYPos(),false);
-		}
-		else if (playerDirection == RIGHT_DIRECTION && player->_leftGridType != GRID_BOMB)
-		{
-			gameMap->setMapTypeAtGridPos(player->getPlayerXPos()-1,player->getPlayerYPos(),GRID_NORMAL);
-			//gameMap->updateGridWithPlayerPosition(player->getPlayerXPos()-1,player->getPlayerYPos(),false);
-		}
-		else if (playerDirection == UP_DIRECTION && player->_downGridType != GRID_BOMB)
-		{
-			gameMap->setMapTypeAtGridPos(player->getPlayerXPos(),player->getPlayerYPos()+1,GRID_NORMAL);
-			//gameMap->updateGridWithPlayerPosition(player->getPlayerXPos(),player->getPlayerYPos()+1,false);
-		}
-		else if (playerDirection == DOWN_DIRECTION && player->_upGridType != GRID_BOMB)
-		{
-			gameMap->setMapTypeAtGridPos(player->getPlayerXPos(),player->getPlayerYPos()-1,GRID_NORMAL);
-			//gameMap->updateGridWithPlayerPosition(player->getPlayerXPos(),player->getPlayerYPos()-1,false);
+			gameMap->updateGridWithPlayerPosition(i,j,false);
 		}
 	}
-	gameMap->setMapTypeAtGridPos(player->getPlayerXPos(),player->getPlayerYPos(),GRID_PLAYER);
-	//gameMap->updateGridWithPlayerPosition(player->getPlayerXPos(),player->getPlayerYPos(),false);
+
+	gameMap->updateGridWithPlayerPosition(player->getPlayerXPos(),player->getPlayerYPos(),true);
+	/*gameMap->updateGridWithPlayerPosition(player->getPlayerXPos()+1,player->getPlayerYPos(),false);
+	gameMap->updateGridWithPlayerPosition(player->getPlayerXPos()-1,player->getPlayerYPos(),false);
+	gameMap->updateGridWithPlayerPosition(player->getPlayerXPos(),player->getPlayerYPos()+1,false);
+	gameMap->updateGridWithPlayerPosition(player->getPlayerXPos(),player->getPlayerYPos()-1,false);*/
+}
+
+
+void GameScene::updatePlayerLifecycle()
+{
+	if (player->getPlayerHP() <= 0)
+	{
+		gameOver = true;
+	}
 }

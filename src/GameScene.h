@@ -49,7 +49,7 @@ public:
 	void createInput(OIS::Keyboard* keyboard);
 	void createCamera(void);
 	void createScene(void);
-
+	bool gameOver;
 	void Update(const Ogre::FrameEvent& evt);
 
 
@@ -67,6 +67,7 @@ private:
 	void addBonus(Ogre::Vector2 pos);
 	void updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap);
 	void updateMapGridType();
+	void updatePlayerLifecycle();
 };
 
 #endif

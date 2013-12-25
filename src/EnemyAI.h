@@ -4,6 +4,7 @@
 #include "AIBrain.h"
 #include "GameMap.h"
 #include "EnemyAIMotionType.h"
+#include "GameBomb.h"
 //#define START_POSITION Ogre::Vector2(20,0)
 
 typedef enum EnemyDirectionType
@@ -22,9 +23,9 @@ public:
 
 	virtual void Start(void);
 	virtual void Update(const Ogre::FrameEvent& evt,GameMap* map);
-	void Transform(const Ogre::FrameEvent& evt,EnemyAIMotionType type);
+	void Transform(GameMap* gameMap,const Ogre::FrameEvent& evt,EnemyAIMotionType type);
 	Ogre::Vector2 convertWorldPosToGridPos(Ogre::Vector3 pos);
-	void CheckBonusCollision();
+	void CheckBonusCollision(GameMap* gameMap);
 private:
 	//member variables
 	AIBrain myBrain;
@@ -38,6 +39,14 @@ private:
 	Ogre::Vector3 _transVector;
 	int _isTurning;
 
+	int _bombAvailableNumber;
+	int _bombLevel;
+	bool _playerIsPlacingBomb;
+	int _bombIndex;
+
+	void AddBomb(GameMap* gameMap);
+	void updateBomb(const Ogre::FrameEvent& evt,GameMap* gameMap);
+	std::map<int,GameBomb*> _bombList;
 	void updateMyPosition();
 	void Rotate();
 };

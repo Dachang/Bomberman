@@ -1,8 +1,9 @@
 #include "GameBomb.h"
 
-GameBomb::GameBomb(Ogre::Entity* entity,Ogre::SceneNode* node,Ogre::SceneManager *sceneMgr,Ogre::Camera *camera,OIS::Keyboard *keyboard)
+GameBomb::GameBomb(Ogre::Entity* entity,Ogre::SceneNode* node,Ogre::SceneManager *sceneMgr,Ogre::Camera *camera,OIS::Keyboard *keyboard,int BombLevel=3)
 	:GameObject(entity,node,sceneMgr,camera,keyboard)
 {
+	_bombLevel=BombLevel;
 	Start();
 }
 
@@ -13,11 +14,11 @@ GameBomb::~GameBomb(void)
 
 void GameBomb::Start(void)
 {
-	_timeToExplode = 5.0;
+	_timeToExplode = 4.0;
 	_explodeDuration = 0.5;
 }
 
-void GameBomb::Update(const Ogre::FrameEvent& evt,GameMap* map)
+bool GameBomb::Update(const Ogre::FrameEvent& evt,GameMap* map)
 {
 	countDown(evt);
 	if (_timeToExplode <= 0)
@@ -27,8 +28,10 @@ void GameBomb::Update(const Ogre::FrameEvent& evt,GameMap* map)
 		if (_explodeDuration <= 0)
 		{
 			revertPowerZone(map);
+			return true;
 		}
 	}
+	return false;
 }
 
 void GameBomb::setPosition(Ogre::Vector2 pos)
@@ -54,7 +57,7 @@ void GameBomb::explode(GameMap* map)
 
 void GameBomb::expandPowerZone(GameMap* map)
 {
-	for (int i=1; i<6; i++)
+	for (int i=1; i<_bombLevel; i++)
 	{
 		if (_bombPosition.x - i >=0)
 		{
@@ -77,7 +80,7 @@ void GameBomb::expandPowerZone(GameMap* map)
 
 void GameBomb::revertPowerZone(GameMap* map)
 {
-	for (int i=1; i<6; i++)
+	for (int i=1; i<_bombLevel; i++)
 	{
 		map->setMapTypeAtGridPos(_bombPosition.x - i,_bombPosition.y,GRID_NORMAL);
 		map->setMapTypeAtGridPos(_bombPosition.x + i,_bombPosition.y,GRID_NORMAL);
