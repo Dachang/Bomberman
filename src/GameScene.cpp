@@ -98,7 +98,7 @@ void GameScene::createScene(void)
 	Ogre::SceneNode* PlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("playerNode");
 	Ogre::Vector2 testvector=Ogre::Vector2(20,5);
 	PlayerNode->setPosition(getWorldCoord( testvector));
-	PlayerNode->setScale(2.0,2.0,2.0);
+	PlayerNode->setScale(1.0,1.0,1.0);
 	PlayerNode->attachObject(playerEntity);
 
 
@@ -191,9 +191,11 @@ void GameScene::createScene(void)
 	//terrain
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
 	Ogre::MeshManager::getSingleton().createPlane("ground", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		plane, 3000, 3000, 20, 20, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+		plane, 3000, 3000, 20, 20, true, 1, 25, 25, Ogre::Vector3::UNIT_Z);
 	Ogre::Entity* entGround = mSceneMgr->createEntity("GroundEntity", "ground");
-	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(entGround);
+	Ogre::SceneNode* planeNode= mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	planeNode->attachObject(entGround);
+	planeNode->setPosition(60,0,60);
 	entGround->setMaterialName("Examples/GrassFloor");
 	entGround->setCastShadows(false);
 
@@ -217,8 +219,8 @@ Ogre::Vector3 GameScene::getWorldCoord(Ogre::Vector2 pos)
 {
 	Ogre::Vector3 rtn;
 	rtn.y = 0;
-	rtn.x = 120*(pos.x - 12);
-	rtn.z = 120*(pos.y - 10);
+	rtn.x = 120*(pos.x - 12)+60;
+	rtn.z = 120*(pos.y - 10)+60;
 	return rtn;
 }
 

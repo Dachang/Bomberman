@@ -26,7 +26,7 @@ public:
 	int getPlayerYPos();
 	directionType getPlayerDirection();
 	int getPlayerHP();
-	void updatePlayerWithGrid(GameMap* gameMap);
+	void updatePlayerWithGrid(const Ogre::FrameEvent& evt, GameMap* gameMap);
 	//properties
 	gridType _currentGridType;
 	gridType _lastGridType;
@@ -37,8 +37,11 @@ public:
 private:
 	//member variables
 	int _healthValue;
+	float _unbreakableDuration;
+	bool _unbreakable;
 	Ogre::Real _moveSpeed;  
 	directionType _direction;  
+	directionType lastDirection;
 	Ogre::Vector3 _transVector;
 	int _leftToRight;
 	int _upToDown;
@@ -61,5 +64,9 @@ private:
 	Ogre::Vector2 convertWorldPosToGridPos(Ogre::Vector3 pos);
 	void updateAnimation(const Ogre::FrameEvent& evt);
 	void updateBomb(const Ogre::FrameEvent& evt,GameMap* gameMap);
+	void Transform(GameMap* gameMap,const Ogre::FrameEvent& evt);
+	void TurnBack(GameMap* gameMap);
+	void Rotate();
+	void updateUnbreakable(const Ogre::FrameEvent& evt);
 };
 #endif

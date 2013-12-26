@@ -137,7 +137,7 @@ void GameMap::Update()
 void GameMap::loadMapFile()
 {
 	std::ifstream file;
-	file.open("map2.txt");
+	file.open("map.map");
 	if (!file)
 	{
 		for (int i=0; i<MAP_WIDTH; i++)
@@ -220,8 +220,8 @@ Ogre::Vector3 GameMap::convertGridPosToWorldPos(Ogre::Vector2 pos)
 {
 	Ogre::Vector3 rtn;
 	rtn.y = 50;
-	rtn.x = MAP_GRID_SIZE * (pos.x - 12);
-	rtn.z = MAP_GRID_SIZE * (pos.y - 10);
+	rtn.x = MAP_GRID_SIZE * (pos.x - 12)+60;
+	rtn.z = MAP_GRID_SIZE * (pos.y - 10)+60;
 	return rtn;
 }
 

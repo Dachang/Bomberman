@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#define  MOVESPEED 10;
+
 Player::Player(Ogre::Entity* entity,Ogre::SceneNode* node,Ogre::SceneManager *sceneMgr,Ogre::Camera *camera,OIS::Keyboard *keyboard)
 	:GameObject(entity,node,sceneMgr, camera, keyboard)
 {
@@ -12,8 +14,8 @@ Player::~Player(void)
 
 void Player::Start(void)
 {
-	_healthValue = 30;
-	_moveSpeed = 250;
+	_healthValue = 3;
+	_moveSpeed = MOVESPEED;
 	_direction = UP_DIRECTION;
 	_leftToUp = 1;
 	_leftToRight = 1;
@@ -38,27 +40,29 @@ void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 			if (_bombAvailableNumber > 0)
 			{
 				GameBomb* bomb = new GameBomb(_Entity,_Node,_SceneMgr,_Camera,_Keyboard,_bombLevel);
-				switch(_direction)
-				{
-				case LEFT_DIRECTION:
-					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x+1,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
-					bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x+1,convertWorldPosToGridPos(_Node->getPosition()).y));
-					break;
-				case RIGHT_DIRECTION:
-					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x-1,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
-					bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x-1,convertWorldPosToGridPos(_Node->getPosition()).y));
-					break;
-				case UP_DIRECTION:
-					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y+1,GRID_BOMB);
-					bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y+1));
-					break;
-				case DOWN_DIRECTION:
-					gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y-1,GRID_BOMB);
-					bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y-1));
-					break;
-				default:
-					break;
-				}
+				//switch(_direction)
+				//{
+				//case LEFT_DIRECTION:
+				//	gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x+1,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
+				//	bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x+1,convertWorldPosToGridPos(_Node->getPosition()).y));
+				//	break;
+				//case RIGHT_DIRECTION:
+				//	gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x-1,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
+				//	bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x-1,convertWorldPosToGridPos(_Node->getPosition()).y));
+				//	break;
+				//case UP_DIRECTION:
+				//	gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y+1,GRID_BOMB);
+				//	bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y+1));
+				//	break;
+				//case DOWN_DIRECTION:
+				//	gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y-1,GRID_BOMB);
+				//	bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y-1));
+				//	break;
+				//default:
+				//	break;
+				//}
+				gameMap->setMapTypeAtGridPos(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y,GRID_BOMB);
+				bomb->setPosition(Ogre::Vector2(convertWorldPosToGridPos(_Node->getPosition()).x,convertWorldPosToGridPos(_Node->getPosition()).y));
 				bomb->bombIndex = _bombIndex;
 				_bombList.insert(std::pair<int,GameBomb*>(_bombIndex++,bomb));
 				_bombAvailableNumber--;
@@ -103,12 +107,57 @@ void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 
 	//update
 	updateAnimation(evt);
-	this->_Node->translate(transVector * evt.timeSinceLastFrame,Ogre::Node::TS_LOCAL);
+
+	transVector=transVector;// *evt.timeSinceLastFrame;
+	transVector.x=(int)transVector.x;
+	transVector.y=(int)transVector.y;
+	transVector.z=(int)transVector.z;
+
+	this->_Node->translate(transVector,Ogre::Node::TS_LOCAL);
+	//this->_Node->translate(transVector ,Ogre::Node::TS_LOCAL);
 	this->_pos = convertWorldPosToGridPos(this->_Node->getPosition());
-	updatePlayerWithGrid(gameMap);
+	updatePlayerWithGrid(evt,gameMap);
 	updateBomb(evt,gameMap);
+	TurnBack(gameMap);
 }
 
+
+
+void Player::TurnBack(GameMap* gameMap)
+{
+	int x=_pos.x;
+	int y=_pos.y;
+
+	gridType gridtype= gameMap->getMapTypeAtGridPos(x,y);
+	Ogre::Vector3 transVector = Ogre::Vector3::ZERO;
+	if(gridtype==GRID_WALL)
+	{
+		switch(_direction)
+		{
+		case UP_DIRECTION:
+			_pos.y++;
+			transVector.z+=_moveSpeed*5;
+			this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
+			break;
+		case DOWN_DIRECTION:
+			_pos.y--;
+			transVector.z-=_moveSpeed*5;
+			this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
+			break;
+		case RIGHT_DIRECTION:
+			_pos.x--;
+			transVector.x-=_moveSpeed*5;
+			this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
+			break;
+		case LEFT_DIRECTION:
+			_pos.x++;
+			transVector.x+=_moveSpeed*5;
+			this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
+			break;
+		}
+	}
+
+}
 void Player::playerMoveLeft()
 {
 	switch (_direction)
@@ -240,8 +289,36 @@ void Player::updateAnimation(const Ogre::FrameEvent& evt)
 Ogre::Vector2 Player::convertWorldPosToGridPos(Ogre::Vector3 pos)
 {
 	Ogre::Vector2 rtn;
-	rtn.x = pos.x/120 + 12;
-	rtn.y = pos.z/120 + 10;
+
+	double xTemp=(pos.x-60)/120;
+
+	if(xTemp>0)
+	{
+		rtn.x =  int((pos.x-60)/120+0.5) + 12;
+	}
+	else if (xTemp == 0)
+	{
+		rtn.x =  int((pos.x-60)/120) + 12;
+	}
+	else
+	{
+		rtn.x =  int((pos.x-60)/120-0.5) + 12;
+	}
+	double yTemp=(pos.z-60)/120;
+	if(yTemp>0)
+	{
+		rtn.y = int((pos.z-60)/120+0.5) + 10;
+	}
+	else if (yTemp == 0)
+	{
+		rtn.y = int((pos.z-60)/120) + 10;
+	}
+	else
+	{
+		rtn.y = int((pos.z-60)/120-0.5) + 10;
+	}
+	//rtn.x =  int((pos.x-60)/120+0.5) + 12;
+	//rtn.y = int((pos.z-60)/120+0.5) + 10;
 	return rtn;
 }
 
@@ -260,7 +337,7 @@ directionType Player::getPlayerDirection()
 	return _direction;
 }
 
-void Player::updatePlayerWithGrid(GameMap* gameMap)
+void Player::updatePlayerWithGrid(const Ogre::FrameEvent& evt,GameMap* gameMap)
 {
 	_currentGridType = gameMap->getMapTypeAtGridPos(_pos.x,_pos.y);
 	_lastGridType = gameMap->getLastMapTypeAtGridPos(_pos.x,_pos.y);
@@ -274,8 +351,15 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 	case GRID_ADD_HEALTH:
 		break;
 	case GRID_BOMB_POWER:
-		_healthValue--;
+		if (!_unbreakable)
+		{
+			_healthValue--;
+			_unbreakable = true;
+		}
 		break;
+
+	case  GRID_WALL:
+		//_moveSpeed = 0;
 	default:
 		break;
 	}
@@ -290,9 +374,14 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 		_moveSpeed += 50;
 		break;
 	case GRID_BOMB_POWER:
-		_healthValue--;
+		if (!_unbreakable)
+		{
+			_healthValue--;
+			_unbreakable = true;
+		}
 		break;
 	default:
+		
 		break;
 	}
 	switch(_upGridType)
@@ -303,7 +392,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 			_moveSpeed = 0;
 		}
 		else
-			_moveSpeed = 250;
+			_moveSpeed = MOVESPEED;
 		break;
 	case GRID_DISTORYABLE_WALL:
 		if (_direction == UP_DIRECTION)
@@ -311,7 +400,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 			_moveSpeed = 0;
 		}
 		else
-			_moveSpeed = 250;
+			_moveSpeed = MOVESPEED;
 		break;
 	default:
 		break;
@@ -323,7 +412,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 		{
 			_moveSpeed = 0;
 		}
-		else _moveSpeed = 250;
+		else _moveSpeed = MOVESPEED;
 		break;
 	case GRID_DISTORYABLE_WALL:
 		if (_direction == DOWN_DIRECTION)
@@ -331,7 +420,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 			_moveSpeed = 0;
 		}
 		else
-			_moveSpeed = 250;
+			_moveSpeed = MOVESPEED;
 		break;
 	default:
 		break;
@@ -343,7 +432,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 		{
 			_moveSpeed = 0;
 		}
-		else _moveSpeed = 250;
+		else _moveSpeed = MOVESPEED;
 		break;
 	case GRID_DISTORYABLE_WALL:
 		if (_direction == LEFT_DIRECTION)
@@ -351,7 +440,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 			_moveSpeed = 0;
 		}
 		else
-			_moveSpeed = 250;
+			_moveSpeed = MOVESPEED;
 		break;
 	default:
 		break;
@@ -363,7 +452,7 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 		{
 			_moveSpeed = 0;
 		}
-		else _moveSpeed = 250;
+		else _moveSpeed = MOVESPEED;
 		break;
 	case GRID_DISTORYABLE_WALL:
 		if (_direction == RIGHT_DIRECTION)
@@ -371,11 +460,12 @@ void Player::updatePlayerWithGrid(GameMap* gameMap)
 			_moveSpeed = 0;
 		}
 		else
-			_moveSpeed = 250;
+			_moveSpeed = MOVESPEED;
 		break;
 	default:
 		break;
 	}
+	updateUnbreakable(evt);
 }
 int Player::getPlayerHP()
 {
@@ -404,5 +494,18 @@ void Player::updateBomb(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		}
 		
 	}
+	}
+}
+
+void Player::updateUnbreakable(const Ogre::FrameEvent& evt)
+{
+	if (_unbreakable)
+	{
+		_unbreakableDuration -= evt.timeSinceLastFrame;
+		if (_unbreakableDuration <= 0)
+		{
+			_unbreakable = false;
+			_unbreakableDuration = 2.0;
+		}
 	}
 }

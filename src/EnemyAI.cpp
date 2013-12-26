@@ -13,7 +13,7 @@ EnemyAI::~EnemyAI(void)
 void EnemyAI::Start(void)
 {
 	myMotionType=AI_WAIT;
-	_moveSpeed = 150;
+	_moveSpeed =100;
 	_direction = AI_UP_DIRECTION;
 	lastDirection=_direction;
 	_isTurning = 1;
@@ -180,7 +180,12 @@ void EnemyAI::Transform(GameMap* gameMap,const Ogre::FrameEvent& evt,EnemyAIMoti
 
 	//update
 	//updateAnimation(evt);
-	this->_Node->translate(transVector * evt.timeSinceLastFrame,Ogre::Node::TS_WORLD);
+	transVector=transVector *evt.timeSinceLastFrame;
+	transVector.x=(int)transVector.x;
+	transVector.y=(int)transVector.y;
+	transVector.z=(int)transVector.z;
+	this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
+	//this->_Node->translate(transVector ,Ogre::Node::TS_WORLD);
 }
 void EnemyAI::Rotate()
 {
@@ -191,7 +196,7 @@ void EnemyAI::Rotate()
 Ogre::Vector2 EnemyAI::convertWorldPosToGridPos(Ogre::Vector3 pos)
 {
 	Ogre::Vector2 rtn;
-	rtn.x = (int)pos.x/120 + 12;
-	rtn.y = (int)pos.z/120 + 10;
+	rtn.x = (int)((pos.x-60)/120) + 12;
+	rtn.y = (int)((pos.z-60)/120) + 10;
 	return rtn;
 }

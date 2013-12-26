@@ -222,7 +222,7 @@ void AIBrain::ThinkingForMoving()
 	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
 		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL)
 	{
-		FloodMapForPlayer[x][y] = -100;
+		FloodMapForPlayer[x][y] = -400;
 		return;
 	}
 	FloodMapForPlayer[x][y] = level;
@@ -369,7 +369,7 @@ void AIBrain::ThinkingForMoving()
 	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
 		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL)
 	 {
-		 FloodMapForBonus[x][y] = -100;
+		 FloodMapForBonus[x][y] = -400;
 		 return;
 	 }
 
@@ -647,6 +647,11 @@ void AIBrain::ThinkingForMoving()
 			 myCurrenType=AI_DOWN;
 		 }
 
+		 if(currentWeight<=0)
+		 {
+			 myCurrenType=AI_WAIT;
+		 }
+
 		 //ÅÐ¶ÏÊÇ·ñ·ÅÖÃÕ¨µ¯ ÆÆ»µÇ½
 		 DetectionForDestroyableWall();
 	 }
@@ -672,6 +677,11 @@ void AIBrain::ThinkingForMoving()
 		 {
 			 currentWeight=WeightTable[(int)myPosition.x][(int)myPosition.y+1];
 			 myCurrenType=AI_DOWN_AND_BOMB;
+		 }
+
+		 if(currentWeight<=0)
+		 {
+			 myCurrenType=AI_WAIT;
 		 }
 	 }
  }

@@ -5,7 +5,7 @@
 #include <RTShaderSystem/OgreRTShaderSystem.h>
 
 audiere::AudioDevicePtr device(audiere::OpenDevice());
-audiere::OutputStreamPtr bgStream(audiere::OpenSound(device,"bg.wav",false));
+audiere::OutputStreamPtr bgStream(audiere::OpenSound(device,"Resources/Sound/bg.wav",false));
 
 OgreFramework::OgreFramework(void)
 	:mRoot(0),
@@ -77,7 +77,7 @@ bool OgreFramework::initOgre(void)
 	params["border"] = "fixed";
 	params["FSAA"] = "8";
 	mRoot->initialise(false, "BomberManProj");
-	mWindow = mRoot->createRenderWindow("BomberManProj", 800, 600, false, &params);
+	mWindow = mRoot->createRenderWindow("BomberManProj", 1600, 900, false, &params);
 
 
 	// set default mipmap level
@@ -198,7 +198,7 @@ void OgreFramework::logicalFrameFunc(const Ogre::FrameEvent& evt)
 		{	
 			bgStream->setRepeat(true);
 			bgStream->setVolume(0.5f);
-			bgStream->play();
+			//bgStream->play();
 
 			gameScene.Update(evt);
 
@@ -206,6 +206,13 @@ void OgreFramework::logicalFrameFunc(const Ogre::FrameEvent& evt)
 			{
 				mShutdown = true;
 			}
+			if (gameScene.gameOver)
+			{
+				gameEnd();
+				gameScene.gameOver = false;
+				return;
+			}
+			
 		}
 	default:
 		break;
