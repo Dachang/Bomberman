@@ -125,6 +125,36 @@ void GameMap::Update()
 					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
 					mapGrid[i][j].playerIsInTheGrid = false;
 					break;
+				case GRID_ADD_HEALTH:
+					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("ShaderSystem.mesh");
+					mapGrid[i][j].mapEntity->setCastShadows(false);
+					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					mapGrid[i][j].mapNode->setScale(0.5,0.5,0.5);
+					mapGrid[i][j].mapNode->setPosition(0,0,0);
+					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
+					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+					mapGrid[i][j].playerIsInTheGrid = false;
+					break;
+				case GRID_ADD_BOMB:
+					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("ShaderSystem.mesh");
+					mapGrid[i][j].mapEntity->setCastShadows(false);
+					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					mapGrid[i][j].mapNode->setScale(0.5,0.5,0.5);
+					mapGrid[i][j].mapNode->setPosition(0,0,0);
+					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
+					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+					mapGrid[i][j].playerIsInTheGrid = false;
+					break;
+				case GRID_ADD_POWER:
+					mapGrid[i][j].mapEntity = _sceneMgr->createEntity("ShaderSystem.mesh");
+					mapGrid[i][j].mapEntity->setCastShadows(false);
+					mapGrid[i][j].gridTypeIsAbleToChange = true;
+					mapGrid[i][j].mapNode->setScale(0.5,0.5,0.5);
+					mapGrid[i][j].mapNode->setPosition(0,0,0);
+					mapGrid[i][j].mapNode->setPosition(mapGrid[i][j].worldPos);
+					mapGrid[i][j].mapNode->attachObject(mapGrid[i][j].mapEntity);
+					mapGrid[i][j].playerIsInTheGrid = false;
+					break;
 				default:
 					break;
 				}

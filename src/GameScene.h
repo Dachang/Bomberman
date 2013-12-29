@@ -3,6 +3,7 @@
 #define __GAMESCENE_H__
 
 #include <Ogre.h>
+#include <SdkTrays.h>
 #include <map>
 #include "BMPlayer.h"
 #include "AIBrain.h"
@@ -32,8 +33,6 @@ public:
 	Ogre::SceneNode *nonNPCPlayerNode;
 	Ogre::SceneNode *NPCPlayerNode;
 	Ogre::SceneNode *mapNode[15][13];
-
-
 	
 	Map map;
 	BMPlayer nonNPCPlayer;
@@ -68,6 +67,7 @@ private:
 	void updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap);
 	void updateMapGridType();
 	void updatePlayerLifecycle();
+	void updateBonus();
 };
 
 #endif

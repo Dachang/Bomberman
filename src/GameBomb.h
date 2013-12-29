@@ -24,6 +24,8 @@ private:
 	void explode(GameMap* map);
 	void expandPowerZone(GameMap* map);
 	void revertPowerZone(GameMap* map);
+	//void setupParticleSystem();
+	Ogre::Vector3 convertGridPosToWorldPos(int x,int y);
 };
 
 #endif

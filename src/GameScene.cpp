@@ -201,6 +201,9 @@ void GameScene::createScene(void)
 
 	//sky
 	mSceneMgr->setSkyBox(true, "Examples/SceneSkyBox2", 5000, false);
+
+	//UI Elements
+	
 }
 void GameScene::Update(const Ogre::FrameEvent& evt)
 {
@@ -213,6 +216,8 @@ void GameScene::Update(const Ogre::FrameEvent& evt)
 	gameMap->Update();
 
 	updatePlayerLifecycle();
+
+	updateBonus();
 }
 
 Ogre::Vector3 GameScene::getWorldCoord(Ogre::Vector2 pos)
@@ -306,4 +311,57 @@ void GameScene::updatePlayerLifecycle()
 	{
 		gameOver = true;
 	}
+}
+
+void GameScene::updateBonus()
+{
+	for (int i = 0; i<MAP_WIDTH;i++)
+	{
+		for (int j=0;j<MAP_HEIGHT;j++)
+		{
+			int tempRandom = rand()%120 + 1;
+			gridType tempType = gameMap->getMapTypeAtGridPos(i,j);
+			if (tempType == GRID_NORMAL)
+			{
+				if (tempRandom == 1)
+				{
+					gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_HEALTH);
+				}
+				else if (tempRandom == 2)
+				{
+					gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_BOMB);
+				}
+				else if (tempRandom == 3)
+				{
+					gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_POWER);
+				}
+				else if (tempRandom == 4)
+				{
+					gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_SPEED);
+				}
+			}
+		}
+	}
+
+
+	//gridType tempType = gameMap->getMapTypeAtGridPos(tempXPos,tempYPos);
+	//if (tempType != GRID_WALL || tempType != GRID_DISTORYABLE_WALL)
+	//{
+	//	if (tempRandom == 1)
+	//	{
+	//		gameMap->setMapTypeAtGridPos(tempXPos,tempYPos,GRID_ADD_SPEED);
+	//	}
+	//	else if (tempRandom == 2)
+	//	{
+	//		gameMap->setMapTypeAtGridPos(tempXPos,tempYPos,GRID_ADD_HEALTH);
+	//	}
+	//	else if (tempRandom == 3)
+	//	{
+	//		gameMap->setMapTypeAtGridPos(tempXPos,tempYPos,GRID_ADD_BOMB);
+	//	}
+	//	else if (tempRandom == 4)
+	//	{
+	//		gameMap->setMapTypeAtGridPos(tempXPos,tempYPos,GRID_ADD_POWER);
+	//	}
+	//}
 }

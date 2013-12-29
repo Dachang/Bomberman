@@ -7,6 +7,7 @@
 audiere::AudioDevicePtr device(audiere::OpenDevice());
 audiere::OutputStreamPtr bgStream(audiere::OpenSound(device,"Resources/Sound/bg.wav",false));
 
+
 OgreFramework::OgreFramework(void)
 	:mRoot(0),
 	mPluginsCfg(Ogre::StringUtil::BLANK),
@@ -110,6 +111,12 @@ bool OgreFramework::initOgre(void)
 
 	//Register as a Window listener
 	Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
+
+	//OgreBites::InputContext inputContext;
+	//inputContext.mMouse = mMouse; 
+	//inputContext.mKeyboard = mKeyboard;
+	//mTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", mWindow, inputContext, this);
+
 
 	// initialise menu scene
 	

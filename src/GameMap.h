@@ -2,6 +2,7 @@
 #define __GAMEMAP_H_
 #include <Ogre.h>
 #include <fstream>
+#include <OgreParticleSystem.h>
 
 #define MAP_WIDTH 25
 #define MAP_HEIGHT 20

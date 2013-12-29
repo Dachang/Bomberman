@@ -52,6 +52,7 @@ void GameBomb::calculateDuration(const Ogre::FrameEvent& evt)
 void GameBomb::explode(GameMap* map)
 {
 	map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y,GRID_NORMAL);
+	//setupParticleSystem();
 	expandPowerZone(map);
 }
 
@@ -149,4 +150,20 @@ void GameBomb::revertPowerZone(GameMap* map)
 			}
 		}
 	}
+}
+
+//void GameBomb::setupParticleSystem()
+//{
+//	Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);
+//	psNode->setPosition(convertGridPosToWorldPos(_bombPosition.x,_bombPosition.y));
+//	psNode->setVisible(true);
+//}
+
+Ogre::Vector3 GameBomb::convertGridPosToWorldPos(int x,int y)
+{
+	Ogre::Vector3 rtn;
+	rtn.y = 50;
+	rtn.x = MAP_GRID_SIZE * (x - 12)+60;
+	rtn.z = MAP_GRID_SIZE * (y - 10)+60;
+	return rtn;
 }
