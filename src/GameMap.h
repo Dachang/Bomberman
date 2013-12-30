@@ -2,8 +2,8 @@
 #define __GAMEMAP_H_
 #include <Ogre.h>
 #include <fstream>
+#include <vector>
 #include <OgreParticleSystem.h>
-
 #define MAP_WIDTH 25
 #define MAP_HEIGHT 20
 #define MAP_GRID_SIZE 120
@@ -20,8 +20,10 @@ typedef enum gridType
 	GRID_PLAYER,
 	GRID_BOMB,
 	GRID_BOMB_POWER,
-	GRID_ADD_POWER,
-	GRID_REDUCE_POWER,
+
+	GRID_ADD_BOMB_POWER,
+
+
 	GRID_NOTHING,
 
 };
@@ -36,6 +38,7 @@ typedef struct grid
 	Ogre::SceneNode* mapNode;
 	bool gridTypeIsAbleToChange;
 	bool playerIsInTheGrid;
+	Ogre::ParticleSystem* ps;
 };
 
 class GameMap
@@ -49,18 +52,28 @@ public:
 	void updateGridWithPlayerPosition(int x, int y, bool isPlayerIn);
 	bool isPlayerInTheGrid(int x, int y);
 	int getBombNum();
-	void Update();
+	void Update(const Ogre::FrameEvent& evt);
+	Ogre::Vector2  getPlayerInitPos();
+	bool  getEnemyInitPos(Ogre::Vector2& vec);
+	void setParticleEffectAtGrid(int x, int y, const Ogre::FrameEvent& evt);
+	void destroyParticleEffectAtGrid(int x, int y);
 protected:
 private:
 	Ogre::SceneManager* _sceneMgr;
+	Ogre::Vector2 playerInitPos;
+	std::vector<Ogre::Vector2> enemyListPos;
 	grid mapGrid[MAP_WIDTH][MAP_HEIGHT];
 	int tempGridData[MAP_WIDTH][MAP_HEIGHT];
+	float _destoryParticleDuration;
+
 	void loadMapFile();
 	Ogre::Vector3 convertGridPosToWorldPos(Ogre::Vector2 pos);
 	void generateMapAtScene();
 
 
 	int PowerMap[MAP_WIDTH][MAP_HEIGHT];
+
+	bool GetFolder(std::string& folderpath);
 };
 
 #endif

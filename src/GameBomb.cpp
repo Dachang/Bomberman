@@ -23,7 +23,7 @@ bool GameBomb::Update(const Ogre::FrameEvent& evt,GameMap* map)
 	countDown(evt);
 	if (_timeToExplode <= 0)
 	{
-		explode(map);
+		explode(map,evt);
 		calculateDuration(evt);
 		if (_explodeDuration <= 0)
 		{
@@ -49,10 +49,10 @@ void GameBomb::calculateDuration(const Ogre::FrameEvent& evt)
 	_explodeDuration -= evt.timeSinceLastFrame;
 }
 
-void GameBomb::explode(GameMap* map)
+void GameBomb::explode(GameMap* map,const Ogre::FrameEvent& evt)
 {
 	map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y,GRID_NORMAL);
-	//setupParticleSystem();
+	map->setParticleEffectAtGrid(_bombPosition.x,_bombPosition.y,evt);
 	expandPowerZone(map);
 }
 
@@ -117,6 +117,7 @@ void GameBomb::revertPowerZone(GameMap* map)
 			if (map->getMapTypeAtGridPos(_bombPosition.x-i,_bombPosition.y)==GRID_BOMB_POWER)
 			{
 				map->setMapTypeAtGridPos(_bombPosition.x - i,_bombPosition.y,GRID_NORMAL);
+				map->destroyParticleEffectAtGrid(_bombPosition.x,_bombPosition.y);
 			}
 		}
 	}
@@ -127,6 +128,7 @@ void GameBomb::revertPowerZone(GameMap* map)
 			if (map->getMapTypeAtGridPos(_bombPosition.x+j,_bombPosition.y)==GRID_BOMB_POWER)
 			{
 				map->setMapTypeAtGridPos(_bombPosition.x + j,_bombPosition.y,GRID_NORMAL);
+				map->destroyParticleEffectAtGrid(_bombPosition.x,_bombPosition.y);
 			}
 		}
 	}
@@ -137,6 +139,7 @@ void GameBomb::revertPowerZone(GameMap* map)
 			if (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k)==GRID_BOMB_POWER)
 			{
 				map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k,GRID_NORMAL);
+				map->destroyParticleEffectAtGrid(_bombPosition.x,_bombPosition.y);
 			}	
 		}
 	}
@@ -147,23 +150,9 @@ void GameBomb::revertPowerZone(GameMap* map)
 			if (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m)==GRID_BOMB_POWER)
 			{
 				map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m,GRID_NORMAL);
+				map->destroyParticleEffectAtGrid(_bombPosition.x,_bombPosition.y);
 			}
 		}
 	}
-}
-
-//void GameBomb::setupParticleSystem()
-//{
-//	Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(5);
-//	psNode->setPosition(convertGridPosToWorldPos(_bombPosition.x,_bombPosition.y));
-//	psNode->setVisible(true);
-//}
-
-Ogre::Vector3 GameBomb::convertGridPosToWorldPos(int x,int y)
-{
-	Ogre::Vector3 rtn;
-	rtn.y = 50;
-	rtn.x = MAP_GRID_SIZE * (x - 12)+60;
-	rtn.z = MAP_GRID_SIZE * (y - 10)+60;
-	return rtn;
+	map->destroyParticleEffectAtGrid(_bombPosition.x,_bombPosition.y);
 }

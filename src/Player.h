@@ -4,7 +4,7 @@
 #include "GameMap.h"
 #include "GameBomb.h"
 
-#define START_POSITION Ogre::Vector2(20,0)
+//#define START_POSITION Ogre::Vector2(20,0)
 
 typedef enum directionType
 {
@@ -40,6 +40,7 @@ private:
 	float _unbreakableDuration;
 	bool _unbreakable;
 	Ogre::Real _moveSpeed;  
+	int  MOVESPEED;
 	directionType _direction;  
 	directionType lastDirection;
 	Ogre::Vector3 _transVector;

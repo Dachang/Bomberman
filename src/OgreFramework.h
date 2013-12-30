@@ -9,7 +9,6 @@
 
 #include <Ogre.h>
 #include <OIS.h>
-#include <SdkTrays.h>
 
 #include <audiere.h>
 
@@ -18,8 +17,7 @@
 
 class OgreFramework :
 	public Ogre::FrameListener,
-	public Ogre::WindowEventListener,
-	OgreBites::SdkTrayListener
+	public Ogre::WindowEventListener
 {
 public:
 	OgreFramework(void);
@@ -44,8 +42,6 @@ private:
 	OIS::Mouse *mMouse;
 	MenuScene menuScene;
 	GameScene gameScene;
-	OgreBites::SdkTrayManager *mTrayMgr;
-	Ogre::SceneManager *mSceneMgr;
 
 	bool mShutdown;
 

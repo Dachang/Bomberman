@@ -7,7 +7,6 @@
 audiere::AudioDevicePtr device(audiere::OpenDevice());
 audiere::OutputStreamPtr bgStream(audiere::OpenSound(device,"Resources/Sound/bg.wav",false));
 
-
 OgreFramework::OgreFramework(void)
 	:mRoot(0),
 	mPluginsCfg(Ogre::StringUtil::BLANK),
@@ -112,12 +111,6 @@ bool OgreFramework::initOgre(void)
 	//Register as a Window listener
 	Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 
-	//OgreBites::InputContext inputContext;
-	//inputContext.mMouse = mMouse; 
-	//inputContext.mKeyboard = mKeyboard;
-	//mTrayMgr = new OgreBites::SdkTrayManager("TrayMgr", mWindow, inputContext, this);
-
-
 	// initialise menu scene
 	
 	createMenuScene();
@@ -211,7 +204,8 @@ void OgreFramework::logicalFrameFunc(const Ogre::FrameEvent& evt)
 
 			if (mKeyboard->isKeyDown(OIS::KC_ESCAPE))
 			{
-				mShutdown = true;
+				//mShutdown = true;
+				gameScene.gameOver=true;
 			}
 			if (gameScene.gameOver)
 			{
@@ -241,6 +235,7 @@ void OgreFramework::gameEnd(void)
 	gameScene.nonNPCAnimState = 0;
 	gameScene.NPCAnimState = 0;
 	gameScene.mSceneMgr = 0;
+	gameScene.enemyList.clear();
 	createMenuScene();
 	sceneState = MENUSCENE;
 }

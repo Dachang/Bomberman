@@ -21,11 +21,9 @@ private:
 	int _bombLevel;
 	void countDown(const Ogre::FrameEvent& evt);
 	void calculateDuration(const Ogre::FrameEvent& evt);
-	void explode(GameMap* map);
+	void explode(GameMap* map,const Ogre::FrameEvent& evt);
 	void expandPowerZone(GameMap* map);
 	void revertPowerZone(GameMap* map);
-	//void setupParticleSystem();
-	Ogre::Vector3 convertGridPosToWorldPos(int x,int y);
 };
 
 #endif

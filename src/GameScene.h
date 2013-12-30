@@ -3,7 +3,6 @@
 #define __GAMESCENE_H__
 
 #include <Ogre.h>
-#include <SdkTrays.h>
 #include <map>
 #include "BMPlayer.h"
 #include "AIBrain.h"
@@ -33,6 +32,8 @@ public:
 	Ogre::SceneNode *nonNPCPlayerNode;
 	Ogre::SceneNode *NPCPlayerNode;
 	Ogre::SceneNode *mapNode[15][13];
+
+
 	
 	Map map;
 	BMPlayer nonNPCPlayer;
@@ -40,7 +41,7 @@ public:
 	AIBrain aiBrain;
 
 	std::map<int, Bomb> bombPool;
-
+	std::vector<EnemyAI*>enemyList;
 	bool isSpaceKeyDown;
 
 	void initGameData(void);
@@ -57,17 +58,20 @@ private:
 	GameMap* gameMap;
 	EnemyAI* enemy;
 	//EnemyAI* enemy;
-	std::vector<EnemyAI*>enemyList;
+	
 
 	int bombIndex;
+	float _addBonusDuration;
+	bool _canAddBonus;
 
-	Ogre::Vector3 getWorldCoord(Ogre::Vector2 pos);
+	Ogre::Vector3 getWorldCoord(Ogre::Vector2 pos, float yPos);
 
 	void addBonus(Ogre::Vector2 pos);
 	void updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap);
 	void updateMapGridType();
 	void updatePlayerLifecycle();
-	void updateBonus();
+	void updateBonus(const Ogre::FrameEvent& evt);
+	void updateBonusDuration(const Ogre::FrameEvent& evt);
 };
 
 #endif

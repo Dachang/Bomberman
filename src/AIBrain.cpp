@@ -220,7 +220,9 @@ void AIBrain::ThinkingForMoving()
 	//maybe add another type : bomb ...
 	//
 	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
-		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL)
+		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL
+		||gameMap->getMapTypeAtGridPos(x,y)==GRID_BOMB
+		||gameMap->getMapTypeAtGridPos(x,y)==GRID_BOMB_POWER)
 	{
 		FloodMapForPlayer[x][y] = -400;
 		return;
@@ -259,101 +261,6 @@ void AIBrain::ThinkingForMoving()
 		FloodFillForPlayer(x,y+1,level+1);
 	}
 
-
-
-	////种子
-	//Ogre::Vector2 seedPoint;
-	//seedPoint.x=x;
-	//seedPoint.y=y;
-	//std::queue<Ogre::Vector2> pointQueue;
-	////初始化
-	//pointQueue.push(seedPoint);
-
-	//int count=0;
-	//int textCount=0;
-	////当栈内无数据时停止
-	//while (!pointQueue.empty())
-	//{
-	//	int maxint=Ogre::Math::Pow(4,level-1);
-	//	if(count==0)
-	//	{
-	//		level=1;
-	//	}
-	//	else if(count< Ogre::Math::Pow(4,level-1) )
-	//	{
-
-	//	}
-	//	else if(count>= Ogre::Math::Pow(4,level-1))
-	//	{
-	//		level++;
-	//		count-=maxint;
-	//	}
-	//	count++;
-	//	textCount++;
-
-	//	Ogre::Vector2 temp = pointQueue.front();
-	//	pointQueue.pop();
-	//	if ((temp.x < 0) || (temp.x > MAP_WIDTH) || (temp.y < 0) || (temp.y> MAP_HEIGHT))
-	//		continue;
-
-	//	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
-	//		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL
-	//		||gameMap->getMapTypeAtGridPos(x,y)==GRID_BOMB)
-	//	{
-	//		FloodMapForPlayer[(int)temp.x][(int)temp.y] = -100;
-	//		continue;
-	//	}
-	//	//FloodMapForPlayer[(int)temp.x][(int)temp.y] = level;
-	//	if((int)temp.x==playerPosition.x&&(int)temp.y==playerPosition.y)
-	//	{
-	//		//find the player
-	//		//keep the level
-
-	//			if(level<FloodMapForPlayer[(int)playerPosition.x][(int)playerPosition.y])
-	//			{
-	//				FloodMapForPlayer[(int)playerPosition.x][(int)playerPosition.y] = level;
-	//			}
-	//		
-	//	}
-	//	else
-	//	{
-	//		FloodMapForPlayer[(int)temp.x][(int)temp.y] = level;
-	//	}
-
-
-	//	Ogre::Vector2 old = temp;
-	//	if(FloodMapForPlayer[(int)temp.x-1][(int)temp.y]>=0&&(FloodMapForPlayer[(int)temp.x-1][(int)temp.y]==0||FloodMapForPlayer[(int)temp.x-1][(int)temp.y]>level+1))
-	//	{
-	//		old.x--;
-	//		pointQueue.push(old);
-	//	}
-	//	if(FloodMapForPlayer[(int)temp.x][(int)temp.y-1]>=0&&(FloodMapForPlayer[(int)temp.x][(int)temp.y-1]==0||FloodMapForPlayer[(int)temp.x][(int)temp.y-1]>level+1))
-	//	{
-	//		old = temp;
-	//		old.y--;
-	//		pointQueue.push(old);
-	//	}
-	//	if(FloodMapForPlayer[(int)temp.x+1][(int)temp.y]>=0&&(FloodMapForPlayer[(int)temp.x+1][(int)temp.y]==0||FloodMapForPlayer[(int)temp.x+1][(int)temp.y]>level+1))
-	//	{
-	//		old = temp;
-	//		old.x++;
-	//		pointQueue.push(old);
-	//	}
-	//	if(FloodMapForPlayer[(int)temp.x][(int)temp.y+1]>=0&&(FloodMapForPlayer[(int)temp.x][(int)temp.y+1]==0||FloodMapForPlayer[(int)temp.x][(int)temp.y+1]>level+1))
-	//	{
-	//		old = temp;
-	//		old.y++;
-	//		pointQueue.push(old);
-	//	}
-	//}
-
-
-
-
-
-
-
-
  }
 
  //flood fill 
@@ -367,7 +274,9 @@ void AIBrain::ThinkingForMoving()
 	 //maybe add another type : bomb ...
 	 //
 	if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
-		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL)
+		||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL
+		||gameMap->getMapTypeAtGridPos(x,y)==GRID_BOMB
+		||gameMap->getMapTypeAtGridPos(x,y)==GRID_BOMB_POWER)
 	 {
 		 FloodMapForBonus[x][y] = -400;
 		 return;
@@ -406,93 +315,6 @@ void AIBrain::ThinkingForMoving()
 	 {
 		 FloodFillForBonus(x,y+1,level+1);
 	 }
-
-
-
-	 ////种子
-	 //Ogre::Vector2 seedPoint;
-	 //seedPoint.x=x;
-	 //seedPoint.y=y;
-	 //std::queue<Ogre::Vector2> pointQueue;
-	 ////初始化
-
-	 //pointQueue.push(seedPoint);
-
-	 //int count=0;
-	 //int testCount=0;
-	 ////当栈内无数据时停止
-	 //while (!pointQueue.empty())
-	 //{
-		// int maxint=Ogre::Math::Pow(4,level-1);
-		// if(count==0)
-		// {
-		//	 level=1;
-		// }
-		// else if(count< Ogre::Math::Pow(4,level-1) )
-		// {
-
-		// }
-		// else if(count>= Ogre::Math::Pow(4,level-1))
-		// {
-		//	 level++;
-		//	 count-=maxint;
-		// }
-		// count++;
-		// testCount++;
-		// Ogre::Vector2 temp = pointQueue.front();
-		// pointQueue.pop();
-		// if ((temp.x < 0) || (temp.x >= MAP_WIDTH) || (temp.y < 0) || (temp.y>= MAP_HEIGHT))
-		//	 continue;
-
-		// if(gameMap->getMapTypeAtGridPos(x,y)==GRID_WALL
-		//	 ||gameMap->getMapTypeAtGridPos(x,y)==GRID_DISTORYABLE_WALL
-		//	 ||gameMap->getMapTypeAtGridPos(x,y)==GRID_BOMB)
-		// {
-		//	 FloodMapForBonus[(int)temp.x][(int)temp.y] = -100;
-		//	 continue;
-		// }
-		// FloodMapForBonus[(int)temp.x][(int)temp.y] = level;
-		// if((int)temp.x==bonusPosition.x&&(int)temp.y==bonusPosition.y)
-		// {
-		//	 //find the player
-		//	 //keep the level
-		//	 if(BonusFillLevel==0)
-		//	 {
-		//		 BonusFillLevel=level;
-		//	 }
-		//	 else
-		//	 {
-		//		 if(level<BonusFillLevel)
-		//		 {
-		//			 BonusFillLevel=level;
-		//		 }
-		//	 }
-		// }
-		// Ogre::Vector2 old = temp;
-		// if(FloodMapForBonus[x-1][y]>=0&&(FloodMapForBonus[x-1][y]==0))//||FloodMapForBonus[x-1][y]>level+1))
-		// {
-		//	 old.x--;
-		//	 pointQueue.push(old);
-		// }
-		// if(FloodMapForBonus[x][y-1]>=0&&(FloodMapForBonus[x][y-1]==0))//||FloodMapForBonus[x][y-1]>level+1))
-		// {
-		//	 old = temp;
-		//	 old.y--;
-		//	 pointQueue.push(old);
-		// }
-		// if(FloodMapForBonus[x+1][y]>=0&&(FloodMapForBonus[x+1][y]==0))//||FloodMapForBonus[x+1][y]>level+1))
-		// {
-		//	 old = temp;
-		//	 old.x++;
-		//	 pointQueue.push(old);
-		// }
-		// if(FloodMapForBonus[x][y+1]>=0&&(FloodMapForBonus[x][y+1]==0))//||FloodMapForBonus[x][y+1]>level+1))
-		// {
-		//	 old = temp;
-		//	 old.y++;
-		//	 pointQueue.push(old);
-		// }
-	 //}
  }
 
  //PlayerOrBonus 0 = player
@@ -540,25 +362,29 @@ void AIBrain::ThinkingForMoving()
 	 //maybe add another type : bomb ...
 	 //
 	 if(gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_WALL||
-		 gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_DISTORYABLE_WALL)
+		 gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_DISTORYABLE_WALL
+		 ||gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)==GRID_BOMB_POWER)
 	 {
 		 WeightTable[(int)myPosition.x-1][(int)myPosition.y]+=-100; 
 		 timeToLiveOfmotion=0;
 	 }
 	 if(gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_WALL||
-		 gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_DISTORYABLE_WALL)
+		 gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_DISTORYABLE_WALL
+		 ||gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)==GRID_BOMB_POWER)
 	 {
 		 WeightTable[(int)myPosition.x+1][(int)myPosition.y]+=-100; 
 		  timeToLiveOfmotion=0;
 	 }
 	 if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_WALL||
-		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_DISTORYABLE_WALL)
+		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_DISTORYABLE_WALL
+		 ||gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)==GRID_BOMB_POWER)
 	 {
 		 WeightTable[(int)myPosition.x][(int)myPosition.y-1]+=-100; 
 		  timeToLiveOfmotion=0;
 	 }
 	 if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_WALL||
-		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_DISTORYABLE_WALL)
+		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_DISTORYABLE_WALL
+		 ||gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)==GRID_BOMB_POWER)
 	 {
 		 WeightTable[(int)myPosition.x][(int)myPosition.y+1]+=-100; 
 		  timeToLiveOfmotion=0;
@@ -566,25 +392,29 @@ void AIBrain::ThinkingForMoving()
 
 	 //add weight in the direction without wall 
 	 if(gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)!=GRID_WALL&&
-		 gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)!=GRID_DISTORYABLE_WALL)
+		 gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)!=GRID_DISTORYABLE_WALL
+		 &&gameMap->getMapTypeAtGridPos(myPosition.x-1,myPosition.y)!=GRID_BOMB)
 	 {
 		 srand((unsigned)time(0));
 		 WeightTable[(int)myPosition.x-1][(int)myPosition.y]+= (rand()&7)*1;
 	 }
 	 if(gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)!=GRID_WALL
-		 &&gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)!=GRID_DISTORYABLE_WALL)
+		 &&gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)!=GRID_DISTORYABLE_WALL
+		 &&gameMap->getMapTypeAtGridPos(myPosition.x+1,myPosition.y)!=GRID_BOMB)
 	 {
 		 srand(2);
 		WeightTable[(int)myPosition.x+1][(int)myPosition.y]+= (rand()&7)*1;
 	 }
 	 if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)!=GRID_WALL&&
-		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)!=GRID_DISTORYABLE_WALL)
+		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)!=GRID_DISTORYABLE_WALL
+		 && gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y-1)!=GRID_BOMB)
 	 {
 		 srand(3);
 		WeightTable[(int)myPosition.x][(int)myPosition.y-1]+= (rand()&7)*1;
 	 }
 	 if(gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)!=GRID_WALL&&
-		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)!=GRID_DISTORYABLE_WALL)
+		 gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)!=GRID_DISTORYABLE_WALL
+		 &&gameMap->getMapTypeAtGridPos(myPosition.x,myPosition.y+1)!=GRID_BOMB)
 	 {
 		 srand(4);
 		WeightTable[(int)myPosition.x][(int)myPosition.y+1]+= (rand()&4)*1;
@@ -693,8 +523,35 @@ double AIBrain::Distance(Ogre::Vector2 from,Ogre::Vector2 to)
 Ogre::Vector2 AIBrain::convertWorldPosToGridPos(Ogre::Vector3 pos)
 {
 	Ogre::Vector2 rtn;
-	rtn.x = pos.x/120 + 12;
-	rtn.y = pos.z/120 + 10;
+	double xTemp=(pos.x-60)/120;
+
+	if(xTemp>0)
+	{
+		rtn.x =  int((pos.x-60)/120+0.5) + 12;
+	}
+	else if (xTemp == 0)
+	{
+		rtn.x =  int((pos.x-60)/120) + 12;
+	}
+	else
+	{
+		rtn.x =  int((pos.x-60)/120-0.5) + 12;
+	}
+	double yTemp=(pos.z-60)/120;
+	if(yTemp>0)
+	{
+		rtn.y = int((pos.z-60)/120+0.5) + 10;
+	}
+	else if (yTemp == 0)
+	{
+		rtn.y = int((pos.z-60)/120) + 10;
+	}
+	else
+	{
+		rtn.y = int((pos.z-60)/120-0.5) + 10;
+	}
+	//rtn.x =  int((pos.x-60)/120+0.5) + 12;
+	//rtn.y = int((pos.z-60)/120+0.5) + 10;
 	return rtn;
 }
 

@@ -7,6 +7,8 @@ GameScene::GameScene(void)
 	isSpaceKeyDown = false;
 	bombIndex = 0;
 	gameOver = false;
+	_addBonusDuration = 20.0;
+	_canAddBonus = true;
 }
 
 GameScene::~GameScene(void)
@@ -34,7 +36,7 @@ void GameScene::initGameData(void)
 
 void GameScene::createSceneMgr(Ogre::Root *_root)
 {
-	mSceneMgr = _root->createSceneManager(Ogre::ST_GENERIC, "MenuSceneMgr");
+	mSceneMgr = _root->createSceneManager(Ogre::ST_GENERIC, "GameSceneMgr");
 
 }
 void GameScene::createInput(OIS::Keyboard* keyboard)
@@ -51,53 +53,53 @@ void GameScene::createCamera(void)
 
 void GameScene::createScene(void)
 {
-#pragma region tempboard
-	Ogre::Entity *tempBoard = mSceneMgr->createEntity("bomb_tempboard","cube.mesh");
-	tempBoard->setMaterialName("Examples/Rockwall");
-	Ogre::SceneNode *tempBoardNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("boomb_tempboard");
-	//tempBoardNode->setScale(7.0,7.0,7.0);
-	tempBoardNode->setPosition(0,0,0);
-	Ogre::Quaternion q1 = tempBoardNode->getOrientation();
-	Ogre::Quaternion q2(Ogre::Degree(90),Ogre::Vector3::UNIT_Y);
-	tempBoardNode->setOrientation(q1*q2);
-	tempBoardNode->attachObject(tempBoard);
-#pragma endregion
+//#pragma region tempboard
+//	Ogre::Entity *tempBoard = mSceneMgr->createEntity("bomb_tempboard","cube.mesh");
+//	tempBoard->setMaterialName("Examples/Rockwall");
+//	Ogre::SceneNode *tempBoardNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("boomb_tempboard");
+//	//tempBoardNode->setScale(7.0,7.0,7.0);
+//	tempBoardNode->setPosition(0,0,0);
+//	Ogre::Quaternion q1 = tempBoardNode->getOrientation();
+//	Ogre::Quaternion q2(Ogre::Degree(90),Ogre::Vector3::UNIT_Y);
+//	tempBoardNode->setOrientation(q1*q2);
+//	tempBoardNode->attachObject(tempBoard);
+//#pragma endregion
 
-	for(int x=0;x<15;++x)
-	{
-		for(int y=0;y<13;++y)
-		{
-			if(map.getMapAtPos(x,y)==MAP_DESTROYABLE)
-			{
-				Ogre::Entity *destroyableBlock = mSceneMgr->createEntity("cube.mesh");
-				//destroyableBlock->setMaterialName("Examples/Rockwall");
-				destroyableBlock->setCastShadows(true);
-				mapNode[x][y] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-				mapNode[x][y]->setPosition(0,0,0);
-				mapNode[x][y]->setPosition(getWorldCoord(Ogre::Vector2(x,y)));
-				mapNode[x][y]->attachObject(destroyableBlock);
-			}
-			else if(map.getMapAtPos(x,y) == MAP_INDESTROYABLE)
-			{
-				Ogre::Entity *indestroyableBlock = mSceneMgr->createEntity("cube.mesh");
-				//indestroyableBlock->setMaterialName("boomb_testInDestroyable");
-				indestroyableBlock->setCastShadows(true);
-				mapNode[x][y] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-				mapNode[x][y]->setPosition(0,0,0);
-				mapNode[x][y]->setPosition(getWorldCoord(Ogre::Vector2(x,y)));
-				mapNode[x][y]->attachObject(indestroyableBlock);
-			}
-		}
-	}
+	//for(int x=0;x<15;++x)
+	//{
+	//	for(int y=0;y<13;++y)
+	//	{
+	//		if(map.getMapAtPos(x,y)==MAP_DESTROYABLE)
+	//		{
+	//			Ogre::Entity *destroyableBlock = mSceneMgr->createEntity("cube.mesh");
+	//			//destroyableBlock->setMaterialName("Examples/Rockwall");
+	//			destroyableBlock->setCastShadows(true);
+	//			mapNode[x][y] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	//			mapNode[x][y]->setPosition(0,0,0);
+	//			mapNode[x][y]->setPosition(getWorldCoord(Ogre::Vector2(x,y)));
+	//			mapNode[x][y]->attachObject(destroyableBlock);
+	//		}
+	//		else if(map.getMapAtPos(x,y) == MAP_INDESTROYABLE)
+	//		{
+	//			Ogre::Entity *indestroyableBlock = mSceneMgr->createEntity("cube.mesh");
+	//			//indestroyableBlock->setMaterialName("boomb_testInDestroyable");
+	//			indestroyableBlock->setCastShadows(true);
+	//			mapNode[x][y] = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	//			mapNode[x][y]->setPosition(0,0,0);
+	//			mapNode[x][y]->setPosition(getWorldCoord(Ogre::Vector2(x,y)));
+	//			mapNode[x][y]->attachObject(indestroyableBlock);
+	//		}
+	//	}
+	//}
 
-	gameMap = new GameMap(mSceneMgr);
+	gameMap =  new GameMap(mSceneMgr);
 
 	//test player
 	Ogre::Entity *playerEntity = mSceneMgr->createEntity("player","ninja.mesh");
 	playerEntity->setCastShadows(false);
 	Ogre::SceneNode* PlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("playerNode");
-	Ogre::Vector2 testvector=Ogre::Vector2(20,5);
-	PlayerNode->setPosition(getWorldCoord( testvector));
+	//Ogre::Vector2 testvector=Ogre::Vector2(20,5);
+	PlayerNode->setPosition(getWorldCoord( gameMap->getPlayerInitPos(),0));
 	PlayerNode->setScale(1.0,1.0,1.0);
 	PlayerNode->attachObject(playerEntity);
 
@@ -106,76 +108,125 @@ void GameScene::createScene(void)
 
 	//add 3 enemy
 	//1
-	Ogre::Entity *npc = mSceneMgr->createEntity("npcplayer1","ninja.mesh");
+	EnemyAI* tempEnemy;
+	Ogre::Vector2 vectorPosition;
+	bool isVisible;
+	Ogre::Entity *npc;
+
+	npc = mSceneMgr->createEntity("Bomberman1Sphere12.mesh");
 	npc->setCastShadows(false);
-	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("npcplayerNode1");
-	NPCPlayerNode->setScale(2.0,2.0,2.0);
-	Ogre::Vector2 vectorPosition=Ogre::Vector2(5,5);
-	NPCPlayerNode->setPosition(getWorldCoord(vectorPosition));
-	NPCPlayerNode->attachObject(npc);
-
-	//
-	EnemyAI* tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
-
+	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	NPCPlayerNode->setScale(120,120,120);
+	NPCPlayerNode->yaw(Ogre::Degree(180));
+	isVisible=gameMap->getEnemyInitPos(vectorPosition);
+	if(isVisible)
+	{
+		NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,80));
+		NPCPlayerNode->attachObject(npc);
+		tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
+	}
+	else
+	{
+		vectorPosition.x=1;
+		vectorPosition.y=1;
+		NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,80));
+		NPCPlayerNode->attachObject(npc);
+		tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
+		tempEnemy->setDead();
+	}
 	//push
 	enemyList.push_back(tempEnemy);
-	//2
-	npc = mSceneMgr->createEntity("npcplayer2","ninja.mesh");
-	npc->setCastShadows(false);
-	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("npcplayerNode2");
-	NPCPlayerNode->setScale(2.0,2.0,2.0);
-	vectorPosition=Ogre::Vector2(15,15);
-	NPCPlayerNode->setPosition(getWorldCoord(vectorPosition));
-	//NPCPlayerNode->yaw( Ogre::Degree( -90 ) );
-	NPCPlayerNode->attachObject(npc);
 
-	tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
-	enemyList.push_back(tempEnemy);
-	//3
-	npc = mSceneMgr->createEntity("npcplayer3","ninja.mesh");
+	//2
+
+	npc = mSceneMgr->createEntity("bomberman2Sphere09.mesh");
 	npc->setCastShadows(false);
-	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("npcplayerNode3");
-	NPCPlayerNode->setScale(2.0,2.0,2.0);
+	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	NPCPlayerNode->setScale(120,120,120);
+	NPCPlayerNode->yaw(Ogre::Degree(180));
+	isVisible=gameMap->getEnemyInitPos(vectorPosition);
+	if(isVisible)
+	{
+		NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,80));
+		NPCPlayerNode->attachObject(npc);
+		tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
+	}
+	else
+	{
+		vectorPosition.x=1;
+		vectorPosition.y=1;
+		NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,80));
+		NPCPlayerNode->attachObject(npc);
+		tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
+		tempEnemy->setDead();
+	}
+	//push
+	enemyList.push_back(tempEnemy);
+
+
+	//npc = mSceneMgr->createEntity("ninja.mesh");
+	//npc->setCastShadows(false);
+	//NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	//NPCPlayerNode->setScale(1.5,1.0,1.5);
+	//vectorPosition=Ogre::Vector2(15,15);
+	//NPCPlayerNode->setPosition(getWorldCoord(vectorPosition));
+	////NPCPlayerNode->yaw( Ogre::Degree( -90 ) );
+	//NPCPlayerNode->attachObject(npc);
+
+	//tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
+	//enemyList.push_back(tempEnemy);
+	//3
+
+	npc = mSceneMgr->createEntity("Bomberman1Sphere12.mesh");
+	npc->setCastShadows(false);
+	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	NPCPlayerNode->setScale(120,120,120);
+	NPCPlayerNode->yaw(Ogre::Degree(180));
+	isVisible=gameMap->getEnemyInitPos(vectorPosition);
+	if(isVisible)
+	{
+		NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,80));
+		NPCPlayerNode->attachObject(npc);
+		tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
+	}
+	else
+	{
+		vectorPosition.x=1;
+		vectorPosition.y=1;
+		NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,80));
+		NPCPlayerNode->attachObject(npc);
+		tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
+		tempEnemy->setDead();
+	}
+	//push
+	enemyList.push_back(tempEnemy);
+	/*
+	npc = mSceneMgr->createEntity("ninja.mesh");
+	npc->setCastShadows(false);
+	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	NPCPlayerNode->setScale(1.5,1.0,1.5);
 	vectorPosition=Ogre::Vector2(5,13);
 	NPCPlayerNode->setPosition(getWorldCoord(vectorPosition));
 	NPCPlayerNode->attachObject(npc);
 	tempEnemy=new EnemyAI(npc,NPCPlayerNode,mSceneMgr,mCamera,mKeyboard);
-	enemyList.push_back(tempEnemy);
+	enemyList.push_back(tempEnemy);*/
 
-	/*Ogre::Entity* bonus = mSceneMgr->createEntity("bonus1","cube.mesh");
-	bonus->setCastShadows(false);
-	Ogre::SceneNode* bonusNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("bonus1");
-	bonusNode->setScale(0.7,0.7,0.7);
-	vectorPosition=Ogre::Vector2(3,15);
-	Ogre::Vector3 tempVector=getWorldCoord(vectorPosition);
-	tempVector.y+=50;
-	bonusNode->setPosition(tempVector);
-	bonusNode->attachObject(bonus);
-
-	bonus = mSceneMgr->createEntity("bonus2","cube.mesh");
-	bonus->setCastShadows(false);
-	bonusNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("bonus2");
-	bonusNode->setScale(0.7,0.7,0.7);
-	vectorPosition=Ogre::Vector2(22,3);
-	tempVector=getWorldCoord(vectorPosition);
-	tempVector.y+=50;
-	bonusNode->setPosition(tempVector);
-	bonusNode->attachObject(bonus);
-
-	bonus = mSceneMgr->createEntity("bonus3","cube.mesh");
-	bonus->setCastShadows(false);
-	bonusNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("bonus3");
-	bonusNode->setScale(0.7,0.7,0.7);
-	vectorPosition=Ogre::Vector2(20,10);
-	tempVector=getWorldCoord(vectorPosition);
-	tempVector.y+=50;
-	bonusNode->setPosition(tempVector);
-	bonusNode->attachObject(bonus);*/
+	
 
 	//ÉèÖÃbonus
-	gameMap->setMapTypeAtGridPos(3,15,GRID_ADD_SPEED);
-	gameMap->setMapTypeAtGridPos(22,3,GRID_ADD_SPEED);
-	gameMap->setMapTypeAtGridPos(20,10,GRID_ADD_SPEED);
+	//gameMap->setMapTypeAtGridPos(3,15,GRID_ADD_SPEED);
+	//gameMap->setMapTypeAtGridPos(12,3,GRID_ADD_SPEED);
+	//gameMap->setMapTypeAtGridPos(20,10,GRID_ADD_HEALTH);
+
+
+	//gameMap->setMapTypeAtGridPos(7,15,GRID_ADD_HEALTH);
+	//gameMap->setMapTypeAtGridPos(22,3,GRID_ADD_SPEED);
+	//gameMap->setMapTypeAtGridPos(20,10,GRID_ADD_BOMB);
+
+	//gameMap->setMapTypeAtGridPos(3,7,GRID_ADD_HEALTH);
+	//gameMap->setMapTypeAtGridPos(4,3,GRID_ADD_BOMB_POWER);
+	//gameMap->setMapTypeAtGridPos(1,2,GRID_ADD_BOMB);
+
 
 	// Set ambient light
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.4, 0.4, 0.4));
@@ -191,7 +242,7 @@ void GameScene::createScene(void)
 	//terrain
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
 	Ogre::MeshManager::getSingleton().createPlane("ground", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		plane, 3000, 3000, 20, 20, true, 1, 25, 25, Ogre::Vector3::UNIT_Z);
+		plane, 3000, 3000, 20, 20, true, 1,12.5, 12.5, Ogre::Vector3::UNIT_Z);
 	Ogre::Entity* entGround = mSceneMgr->createEntity("GroundEntity", "ground");
 	Ogre::SceneNode* planeNode= mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	planeNode->attachObject(entGround);
@@ -201,9 +252,6 @@ void GameScene::createScene(void)
 
 	//sky
 	mSceneMgr->setSkyBox(true, "Examples/SceneSkyBox2", 5000, false);
-
-	//UI Elements
-	
 }
 void GameScene::Update(const Ogre::FrameEvent& evt)
 {
@@ -213,17 +261,17 @@ void GameScene::Update(const Ogre::FrameEvent& evt)
 
 	updateEnemyList(evt,gameMap);
 
-	gameMap->Update();
+	gameMap->Update(evt);
 
 	updatePlayerLifecycle();
 
-	updateBonus();
+	updateBonus(evt);
 }
 
-Ogre::Vector3 GameScene::getWorldCoord(Ogre::Vector2 pos)
+Ogre::Vector3 GameScene::getWorldCoord(Ogre::Vector2 pos, float yPos)
 {
 	Ogre::Vector3 rtn;
-	rtn.y = 0;
+	rtn.y = yPos;
 	rtn.x = 120*(pos.x - 12)+60;
 	rtn.z = 120*(pos.y - 10)+60;
 	return rtn;
@@ -257,7 +305,15 @@ void GameScene::updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap)
 	{
 		//*iter->Update(evt,gameMap);
 		EnemyAI* temp=*iter;
-		temp->Update(evt,gameMap);
+		if(temp->Update(evt,gameMap))
+		{
+			//keep going
+		}
+		else
+		{
+			temp->setVisible(false);
+		}
+		//temp->Update(evt,gameMap);
 		//*iter->Update(evt,gameMap);
 	}
 }
@@ -313,55 +369,51 @@ void GameScene::updatePlayerLifecycle()
 	}
 }
 
-void GameScene::updateBonus()
+void GameScene::updateBonus(const Ogre::FrameEvent& evt)
 {
-	for (int i = 0; i<MAP_WIDTH;i++)
+	if (_canAddBonus)
 	{
-		for (int j=0;j<MAP_HEIGHT;j++)
+		for (int i = 0; i<MAP_WIDTH;i++)
 		{
-			int tempRandom = rand()%120 + 1;
-			gridType tempType = gameMap->getMapTypeAtGridPos(i,j);
-			if (tempType == GRID_NORMAL)
+			for (int j=0;j<MAP_HEIGHT;j++)
 			{
-				if (tempRandom == 1)
+				int tempRandom = rand()%180 + 1;
+				gridType tempType = gameMap->getMapTypeAtGridPos(i,j);
+				if (tempType == GRID_NORMAL)
 				{
-					gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_HEALTH);
-				}
-				else if (tempRandom == 2)
-				{
-					gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_BOMB);
-				}
-				else if (tempRandom == 3)
-				{
-					gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_POWER);
-				}
-				else if (tempRandom == 4)
-				{
-					gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_SPEED);
+					if (tempRandom == 1)
+					{
+						gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_HEALTH);
+					}
+					else if (tempRandom == 2)
+					{
+						gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_BOMB);
+					}
+					else if (tempRandom == 3)
+					{
+						gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_BOMB_POWER);
+					}
+					else if (tempRandom == 4)
+					{
+						gameMap->setMapTypeAtGridPos(i,j,GRID_ADD_SPEED);
+					}
+					_canAddBonus = false;
 				}
 			}
 		}
 	}
+	updateBonusDuration(evt);
+}
 
-
-	//gridType tempType = gameMap->getMapTypeAtGridPos(tempXPos,tempYPos);
-	//if (tempType != GRID_WALL || tempType != GRID_DISTORYABLE_WALL)
-	//{
-	//	if (tempRandom == 1)
-	//	{
-	//		gameMap->setMapTypeAtGridPos(tempXPos,tempYPos,GRID_ADD_SPEED);
-	//	}
-	//	else if (tempRandom == 2)
-	//	{
-	//		gameMap->setMapTypeAtGridPos(tempXPos,tempYPos,GRID_ADD_HEALTH);
-	//	}
-	//	else if (tempRandom == 3)
-	//	{
-	//		gameMap->setMapTypeAtGridPos(tempXPos,tempYPos,GRID_ADD_BOMB);
-	//	}
-	//	else if (tempRandom == 4)
-	//	{
-	//		gameMap->setMapTypeAtGridPos(tempXPos,tempYPos,GRID_ADD_POWER);
-	//	}
-	//}
+void GameScene::updateBonusDuration(const Ogre::FrameEvent& evt)
+{
+	if (!_canAddBonus)
+	{
+		_addBonusDuration -= evt.timeSinceLastFrame;
+		if (_addBonusDuration <= 0)
+		{
+			_canAddBonus = true;
+			_addBonusDuration = 20.0;
+		}
+	}
 }

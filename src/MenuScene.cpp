@@ -21,7 +21,7 @@ void MenuScene::createCamera(void)
 
 	mCamera->setPosition(Ogre::Vector3(0,500,0));
 	// Look back along -Z
-	mCamera->lookAt(Ogre::Vector3(0,0,100));
+	mCamera->lookAt(Ogre::Vector3(0,-80,80));
 	mCamera->setNearClipDistance(5);
 }
 
@@ -77,13 +77,14 @@ void MenuScene::createScene(void)
 	//buildingNode->attachObject(building);
 
 	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
-	Ogre::MeshManager::getSingleton().createPlane("ground", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		plane, 3000, 3000, 20, 20, true, 1, 25, 25, Ogre::Vector3::UNIT_Z);
-	Ogre::Entity* entGround = mSceneMgr->createEntity("GroundEntity", "ground");
+	Ogre::MeshManager::getSingleton().createPlane("ground2", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+		plane, 3000, 3000, 20, 20, true, 1, 12.5, 12.5, Ogre::Vector3::UNIT_Z);
+	Ogre::Entity* entGround = mSceneMgr->createEntity("GroundEntity", "ground2");
 	Ogre::SceneNode* planeNode= mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	planeNode->attachObject(entGround);
-	planeNode->setPosition(0,0,0);
-	entGround->setMaterialName("Examples/GrassFloor");
+	planeNode->setPosition(-570,0,-100);
+	planeNode->setScale(3.15,3.15,3.15);
+	entGround->setMaterialName("Examples/BumpyMetal");
 	entGround->setCastShadows(false);
 	// Set Fog
 

@@ -22,10 +22,12 @@ public:
 	~EnemyAI(void);
 
 	virtual void Start(void);
-	virtual void Update(const Ogre::FrameEvent& evt,GameMap* map);
+	virtual bool Update(const Ogre::FrameEvent& evt,GameMap* map);
 	void Transform(GameMap* gameMap,const Ogre::FrameEvent& evt,EnemyAIMotionType type);
 	Ogre::Vector2 convertWorldPosToGridPos(Ogre::Vector3 pos);
 	void CheckBonusCollision(GameMap* gameMap);
+	void setVisible(bool isVisible);
+	void setDead();
 private:
 	//member variables
 	AIBrain myBrain;
@@ -34,6 +36,7 @@ private:
 	Ogre::Vector2 myPosition;
 
 	Ogre::Real _moveSpeed;  
+	int  MOVESPEED;
 	EnemyDirectionType _direction;
 	EnemyDirectionType lastDirection;
 	Ogre::Vector3 _transVector;
@@ -44,6 +47,11 @@ private:
 	bool _playerIsPlacingBomb;
 	int _bombIndex;
 
+	int healthValue;
+	float unbreakableDuration;
+	bool unbreakable;
+	void UpdateUnbreakable(const Ogre::FrameEvent& evt);
+	void CheckBombCollision(GameMap* gameMap);
 	void AddBomb(GameMap* gameMap);
 	void updateBomb(const Ogre::FrameEvent& evt,GameMap* gameMap);
 	std::map<int,GameBomb*> _bombList;
