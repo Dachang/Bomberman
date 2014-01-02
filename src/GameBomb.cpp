@@ -16,14 +16,23 @@ void GameBomb::Start(void)
 {
 	_timeToExplode = 4.0;
 	_explodeDuration = 0.5;
+	_isExplode = false;
 }
 
 bool GameBomb::Update(const Ogre::FrameEvent& evt,GameMap* map)
 {
 	countDown(evt);
-	if (_timeToExplode <= 0)
+	if ((_timeToExplode <= 0) || map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y)==GRID_BOMB_POWER)
 	{
-		explode(map,evt);
+		if (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y)==GRID_BOMB_POWER)
+		{
+			_timeToExplode = 0;
+		}
+		if (!_isExplode)
+		{
+			explode(map,evt);
+			_isExplode = true;
+		}
 		calculateDuration(evt);
 		if (_explodeDuration <= 0)
 		{
@@ -62,7 +71,7 @@ void GameBomb::expandPowerZone(GameMap* map)
 	{
 		if (_bombPosition.x - i >=0)
 		{
-			if ((map->getMapTypeAtGridPos(_bombPosition.x-i,_bombPosition.y)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x-i,_bombPosition.y)==GRID_BOMB))
+			if ((map->getMapTypeAtGridPos(_bombPosition.x-i,_bombPosition.y)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x-i,_bombPosition.y)==GRID_BOMB_POWER))
 			{
 				break;
 			}
@@ -74,7 +83,7 @@ void GameBomb::expandPowerZone(GameMap* map)
 	{
 		if (_bombPosition.x + j < 25)
 		{
-			if ((map->getMapTypeAtGridPos(_bombPosition.x+j,_bombPosition.y)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x+j,_bombPosition.y)==GRID_BOMB))
+			if ((map->getMapTypeAtGridPos(_bombPosition.x+j,_bombPosition.y)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x+j,_bombPosition.y)==GRID_BOMB_POWER))
 			{
 				break;
 			}
@@ -86,7 +95,7 @@ void GameBomb::expandPowerZone(GameMap* map)
 	{
 		if (_bombPosition.y - k >=0)
 		{
-			if ((map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k)==GRID_BOMB))
+			if ((map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y - k)==GRID_BOMB_POWER))
 			{
 				break;
 			}
@@ -98,7 +107,7 @@ void GameBomb::expandPowerZone(GameMap* map)
 	{
 		if(_bombPosition.y + m < 20)
 		{
-			if ((map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m)==GRID_BOMB))
+			if ((map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m)==GRID_WALL) || (map->getMapTypeAtGridPos(_bombPosition.x,_bombPosition.y + m)==GRID_BOMB_POWER))
 			{
 				break;
 			}

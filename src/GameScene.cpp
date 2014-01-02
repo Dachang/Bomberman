@@ -1,5 +1,7 @@
 #include "GameScene.h"
 
+int enemyNum = 3;
+
 GameScene::GameScene(void)
 {
 	nonNPCAnimState = NULL;
@@ -7,6 +9,7 @@ GameScene::GameScene(void)
 	isSpaceKeyDown = false;
 	bombIndex = 0;
 	gameOver = false;
+	gameWin = false;
 	_addBonusDuration = 20.0;
 	_canAddBonus = true;
 }
@@ -95,12 +98,12 @@ void GameScene::createScene(void)
 	gameMap =  new GameMap(mSceneMgr);
 
 	//test player
-	Ogre::Entity *playerEntity = mSceneMgr->createEntity("player","ninja.mesh");
+	Ogre::Entity *playerEntity = mSceneMgr->createEntity("player","robot.mesh");
 	playerEntity->setCastShadows(false);
 	Ogre::SceneNode* PlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("playerNode");
 	//Ogre::Vector2 testvector=Ogre::Vector2(20,5);
 	PlayerNode->setPosition(getWorldCoord( gameMap->getPlayerInitPos(),0));
-	PlayerNode->setScale(1.0,1.0,1.0);
+	PlayerNode->setScale(4.0,2.0,4.0);
 	PlayerNode->attachObject(playerEntity);
 
 
@@ -251,7 +254,7 @@ void GameScene::createScene(void)
 	entGround->setCastShadows(false);
 
 	//sky
-	mSceneMgr->setSkyBox(true, "Examples/SceneSkyBox2", 5000, false);
+	mSceneMgr->setSkyBox(true, "Examples/SceneSkyBox1", 5000, false);
 }
 void GameScene::Update(const Ogre::FrameEvent& evt)
 {
@@ -266,6 +269,8 @@ void GameScene::Update(const Ogre::FrameEvent& evt)
 	updatePlayerLifecycle();
 
 	updateBonus(evt);
+
+	//updateCalculateWinDuration(evt);
 }
 
 Ogre::Vector3 GameScene::getWorldCoord(Ogre::Vector2 pos, float yPos)
@@ -300,6 +305,7 @@ void GameScene::addBonus(Ogre::Vector2 pos)
 void GameScene::updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap)
 {
 	std::vector<EnemyAI*>::iterator iter=enemyList.begin();
+	int enemyNum = 0;
 
 	for(;iter!=enemyList.end();iter++)
 	{
@@ -312,7 +318,13 @@ void GameScene::updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		else
 		{
 			temp->setVisible(false);
+			enemyNum++;
 		}
+		if (enemyNum == 3)
+		{
+			gameWin = true;
+		}
+		
 		//temp->Update(evt,gameMap);
 		//*iter->Update(evt,gameMap);
 	}

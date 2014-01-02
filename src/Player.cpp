@@ -17,12 +17,12 @@ void Player::Start(void)
 	MOVESPEED=200;
 	_healthValue = 3;
 	_moveSpeed = MOVESPEED;
-	_direction = UP_DIRECTION;
+	_direction = RIGHT_DIRECTION;
 	_leftToUp = 1;
 	_leftToRight = 1;
 	_leftToDown = 1;
-	_rightToDown = 1;
-	_rightToUp = 1;
+	_rightToDown = 0;
+	_rightToUp = 0;
 	_upToDown = 1;
 
 	this->_pos = convertWorldPosToGridPos(this->_Node->getPosition());
@@ -81,30 +81,30 @@ void Player::Update(const Ogre::FrameEvent& evt,GameMap* gameMap)
 	if (_Keyboard->isKeyDown(OIS::KC_RIGHT))
 	{
 		playerMoveRight();
-		transVector.z -= _leftToRight * _moveSpeed;
-		transVector.z += _rightToUp * _moveSpeed;
-		transVector.z += _rightToDown * _moveSpeed;
+		transVector.x += _leftToRight * _moveSpeed;
+		transVector.x -= _rightToUp * _moveSpeed;
+		transVector.x -= _rightToDown * _moveSpeed;
 	}
 	else if (_Keyboard->isKeyDown(OIS::KC_LEFT))
 	{
 		playerMoveLeft();
-		transVector.z += _leftToUp * _moveSpeed;
-		transVector.z += _leftToRight * _moveSpeed;
-		transVector.z += _leftToDown * _moveSpeed;
+		transVector.x -= _leftToUp * _moveSpeed;
+		transVector.x -= _leftToRight * _moveSpeed;
+		transVector.x -= _leftToDown * _moveSpeed;
 	}
 	else if (_Keyboard->isKeyDown(OIS::KC_UP))
 	{
 		playerMoveUp();
-		transVector.z -= _leftToUp * _moveSpeed;
-		transVector.z -= _rightToUp * _moveSpeed;
-		transVector.z += _upToDown * _moveSpeed;
+		transVector.x += _leftToUp * _moveSpeed;
+		transVector.x += _rightToUp * _moveSpeed;
+		transVector.x -= _upToDown * _moveSpeed;
 	}
 	else if (_Keyboard->isKeyDown(OIS::KC_DOWN))
 	{
 		playerMoveDown();
-		transVector.z -= _leftToDown * _moveSpeed;
-		transVector.z -= _rightToDown * _moveSpeed;
-		transVector.z -= _upToDown * _moveSpeed;
+		transVector.x += _leftToDown * _moveSpeed;
+		transVector.x += _rightToDown * _moveSpeed;
+		transVector.x += _upToDown * _moveSpeed;
 	}
 
 	//update
@@ -138,22 +138,22 @@ void Player::TurnBack(GameMap* gameMap)
 		{
 		case UP_DIRECTION:
 			_pos.y++;
-			transVector.z+=_moveSpeed*0.002f;
+			transVector.z+=_moveSpeed*0.2f;
 			this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
 			break;
 		case DOWN_DIRECTION:
 			_pos.y--;
-			transVector.z-=_moveSpeed*0.002f;
+			transVector.z-=_moveSpeed*0.2f;
 			this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
 			break;
 		case RIGHT_DIRECTION:
 			_pos.x--;
-			transVector.x-=_moveSpeed*0.002f;
+			transVector.x-=_moveSpeed*0.2f;
 			this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
 			break;
 		case LEFT_DIRECTION:
 			_pos.x++;
-			transVector.x+=_moveSpeed*0.002f;
+			transVector.x+=_moveSpeed*0.2f;
 			this->_Node->translate(transVector,Ogre::Node::TS_WORLD);
 			break;
 		}
@@ -281,7 +281,7 @@ void Player::updateAnimation(const Ogre::FrameEvent& evt)
 	}
 	else
 	{
-		this->_animationState = this->_Entity->getAnimationState("Idle2");
+		this->_animationState = this->_Entity->getAnimationState("Idle");
 	}
 	this->_animationState->setLoop(true);
 	this->_animationState->setEnabled(true);

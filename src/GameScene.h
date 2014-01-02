@@ -50,6 +50,7 @@ public:
 	void createCamera(void);
 	void createScene(void);
 	bool gameOver;
+	bool gameWin;
 	void Update(const Ogre::FrameEvent& evt);
 
 
@@ -72,6 +73,7 @@ private:
 	void updatePlayerLifecycle();
 	void updateBonus(const Ogre::FrameEvent& evt);
 	void updateBonusDuration(const Ogre::FrameEvent& evt);
+	void updateCalculateWinDuration(const Ogre::FrameEvent& evt);
 };
 
 #endif

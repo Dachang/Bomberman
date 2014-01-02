@@ -19,6 +19,7 @@ private:
 	float _timeToExplode;
 	float _explodeDuration;
 	int _bombLevel;
+	bool _isExplode;
 	void countDown(const Ogre::FrameEvent& evt);
 	void calculateDuration(const Ogre::FrameEvent& evt);
 	void explode(GameMap* map,const Ogre::FrameEvent& evt);
