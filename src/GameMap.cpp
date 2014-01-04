@@ -331,11 +331,25 @@ Ogre::Vector3 GameMap::convertGridPosToWorldPos(Ogre::Vector2 pos)
 	rtn.z = MAP_GRID_SIZE * (pos.y - 10)+60;
 	return rtn;
 }
-void GameMap::setParticleEffectAtGrid(int x, int y, const Ogre::FrameEvent& evt)
+void GameMap::setParticleEffectAtGrid(int x, int y, const Ogre::FrameEvent& evt,particleType pType)
 {
 	/*Ogre::ParticleSystem::setDefaultNonVisibleUpdateTimeout(1);*/
 	assumeTime += evt.timeSinceLastFrame;
-	mapGrid[x][y].ps = _sceneMgr->createParticleSystem("ExplodeEffect"+ Ogre::StringConverter::toString(assumeTime),"Examples/Smoke");
+	switch(pType)
+	{
+	case PARTICLE_BOMB:
+		mapGrid[x][y].ps = _sceneMgr->createParticleSystem("ExplodeEffect"+ Ogre::StringConverter::toString(assumeTime),"Examples/Smoke");
+		break;
+	case PARTICLE_WIN:
+		mapGrid[x][y].ps = _sceneMgr->createParticleSystem("ExplodeEffect"+ Ogre::StringConverter::toString(assumeTime),"Examples/Fireworks");
+		break;
+	case PARTICLE_LOSE:
+		mapGrid[x][y].ps = _sceneMgr->createParticleSystem("ExplodeEffect"+ Ogre::StringConverter::toString(assumeTime),"Examples/Smoke");
+		break;
+	default:
+		break;
+	}
+	//mapGrid[x][y].ps = _sceneMgr->createParticleSystem("ExplodeEffect"+ Ogre::StringConverter::toString(assumeTime),"Examples/Smoke");
 	mapGrid[x][y].mapNode->attachObject(mapGrid[x][y].ps);
 	mapGrid[x][y].mapNode->setPosition(convertGridPosToWorldPos(Ogre::Vector2(mapGrid[x][y].gridPos.x,mapGrid[x][y].gridPos.y)));
 }

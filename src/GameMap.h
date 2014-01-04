@@ -20,12 +20,15 @@ typedef enum gridType
 	GRID_PLAYER,
 	GRID_BOMB,
 	GRID_BOMB_POWER,
-
 	GRID_ADD_BOMB_POWER,
-
-
 	GRID_NOTHING,
+};
 
+typedef enum particleType
+{
+	PARTICLE_BOMB = 0,
+	PARTICLE_WIN,
+	PARTICLE_LOSE,
 };
 
 typedef struct grid
@@ -55,7 +58,7 @@ public:
 	void Update(const Ogre::FrameEvent& evt);
 	Ogre::Vector2  getPlayerInitPos();
 	bool  getEnemyInitPos(Ogre::Vector2& vec);
-	void setParticleEffectAtGrid(int x, int y, const Ogre::FrameEvent& evt);
+	void setParticleEffectAtGrid(int x, int y, const Ogre::FrameEvent& evt,particleType pType);
 	void destroyParticleEffectAtGrid(int x, int y);
 protected:
 private:

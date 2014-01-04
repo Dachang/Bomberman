@@ -186,6 +186,7 @@ void OgreFramework::logicalFrameFunc(const Ogre::FrameEvent& evt)
 	{
 	case MENUSCENE:
 		{
+			bgStream->stop();
 			if (mKeyboard->isKeyDown(OIS::KC_RETURN)){
 				gameStart();
 				return;
@@ -196,9 +197,16 @@ void OgreFramework::logicalFrameFunc(const Ogre::FrameEvent& evt)
 		}
 	case GAMESCENE:
 		{	
-			bgStream->setRepeat(true);
-			bgStream->setVolume(0.5f);
-			//bgStream->play();
+			if (gameScene.showLoseState)
+			{
+				bgStream->stop();
+			}
+			else
+			{
+				bgStream->setRepeat(true);
+				bgStream->setVolume(0.5f);
+				bgStream->play();
+			}
 
 			gameScene.Update(evt);
 
@@ -207,7 +215,7 @@ void OgreFramework::logicalFrameFunc(const Ogre::FrameEvent& evt)
 				//mShutdown = true;
 				gameScene.gameOver=true;
 			}
-			if (gameScene.gameOver)
+			if (gameScene.gameOver || gameScene.gameWin)
 			{
 				gameEnd();
 				gameScene.gameOver = false;
@@ -236,6 +244,8 @@ void OgreFramework::gameEnd(void)
 	gameScene.NPCAnimState = 0;
 	gameScene.mSceneMgr = 0;
 	gameScene.enemyList.clear();
+	gameScene.playerLifeList.clear();
+	gameScene.gameWin = false;
 	createMenuScene();
 	sceneState = MENUSCENE;
 }

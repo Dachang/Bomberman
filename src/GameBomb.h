@@ -2,6 +2,7 @@
 #define __GAMEBOMB_H_
 #include "GameObject.h"
 #include "GameMap.h"
+#include <audiere.h>
 
 class GameBomb : public GameObject
 {

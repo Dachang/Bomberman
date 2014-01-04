@@ -132,7 +132,7 @@ void Player::TurnBack(GameMap* gameMap)
 
 	gridType gridtype= gameMap->getMapTypeAtGridPos(x,y);
 	Ogre::Vector3 transVector = Ogre::Vector3::ZERO;
-	if(gridtype==GRID_WALL)
+	if(gridtype==GRID_WALL || gridtype==GRID_DISTORYABLE_WALL)
 	{
 		switch(_direction)
 		{
@@ -530,6 +530,11 @@ void Player::updatePlayerWithGrid(const Ogre::FrameEvent& evt,GameMap* gameMap)
 int Player::getPlayerHP()
 {
 	return _healthValue;
+}
+
+void Player::setDead()
+{
+	_moveSpeed = 0;
 }
 
 void Player::updateBomb(const Ogre::FrameEvent& evt,GameMap* gameMap)

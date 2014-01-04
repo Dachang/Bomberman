@@ -1,6 +1,8 @@
 #include "GameScene.h"
 
-int enemyNum = 3;
+float winTime = 0;
+audiere::AudioDevicePtr device3(audiere::OpenDevice());
+audiere::OutputStreamPtr gameOverStream(audiere::OpenSound(device3,"Resources/Sound/gameover.wav",false));
 
 GameScene::GameScene(void)
 {
@@ -12,6 +14,10 @@ GameScene::GameScene(void)
 	gameWin = false;
 	_addBonusDuration = 20.0;
 	_canAddBonus = true;
+	_gameWinDuration = 3.0;
+	_gameOverDuration = 3.0;
+	showWinState = false;
+	showLoseState = false;
 }
 
 GameScene::~GameScene(void)
@@ -229,6 +235,39 @@ void GameScene::createScene(void)
 	//gameMap->setMapTypeAtGridPos(3,7,GRID_ADD_HEALTH);
 	//gameMap->setMapTypeAtGridPos(4,3,GRID_ADD_BOMB_POWER);
 	//gameMap->setMapTypeAtGridPos(1,2,GRID_ADD_BOMB);
+	//set life display
+	npc = mSceneMgr->createEntity("PlayerHeadRobot2.mesh");
+	npc->setCastShadows(false);
+	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	NPCPlayerNode->setScale(120,120,120);
+	NPCPlayerNode->pitch(Ogre::Degree(60));
+	vectorPosition.x=13;
+	vectorPosition.y=19;
+	NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,100));
+	NPCPlayerNode->attachObject(npc);
+	playerLifeList.push_back(NPCPlayerNode);
+
+	npc = mSceneMgr->createEntity("PlayerHeadRobot2.mesh");
+	npc->setCastShadows(false);
+	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	NPCPlayerNode->setScale(120,120,120);
+	NPCPlayerNode->pitch(Ogre::Degree(60));
+	vectorPosition.x=12;
+	vectorPosition.y=19;
+	NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,100));
+	NPCPlayerNode->attachObject(npc);
+	playerLifeList.push_back(NPCPlayerNode);
+
+	npc = mSceneMgr->createEntity("PlayerHeadRobot2.mesh");
+	npc->setCastShadows(false);
+	NPCPlayerNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	NPCPlayerNode->setScale(120,120,120);
+	NPCPlayerNode->pitch(Ogre::Degree(60));
+	vectorPosition.x=11;
+	vectorPosition.y=19;
+	NPCPlayerNode->setPosition(getWorldCoord(vectorPosition,100));
+	NPCPlayerNode->attachObject(npc);
+	playerLifeList.push_back(NPCPlayerNode);
 
 
 	// Set ambient light
@@ -268,9 +307,11 @@ void GameScene::Update(const Ogre::FrameEvent& evt)
 
 	updatePlayerLifecycle();
 
+	updatePlayerLifeDisplay();
+
 	updateBonus(evt);
 
-	//updateCalculateWinDuration(evt);
+	updateWinState(evt);
 }
 
 Ogre::Vector3 GameScene::getWorldCoord(Ogre::Vector2 pos, float yPos)
@@ -304,29 +345,32 @@ void GameScene::addBonus(Ogre::Vector2 pos)
 
 void GameScene::updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap)
 {
-	std::vector<EnemyAI*>::iterator iter=enemyList.begin();
-	int enemyNum = 0;
-
-	for(;iter!=enemyList.end();iter++)
+	if (!showLoseState)
 	{
-		//*iter->Update(evt,gameMap);
-		EnemyAI* temp=*iter;
-		if(temp->Update(evt,gameMap))
+		std::vector<EnemyAI*>::iterator iter=enemyList.begin();
+		int enemyNum = 0;
+	
+		for(;iter!=enemyList.end();iter++)
 		{
-			//keep going
+			//*iter->Update(evt,gameMap);
+			EnemyAI* temp=*iter;
+			if(temp->Update(evt,gameMap))
+			{
+				//keep going
+			}
+			else
+			{
+				temp->setVisible(false);
+				enemyNum++;
+			}
+			if (enemyNum == 3)
+			{
+				showWinState = true;
+			}
+			
+			//temp->Update(evt,gameMap);
+			//*iter->Update(evt,gameMap);
 		}
-		else
-		{
-			temp->setVisible(false);
-			enemyNum++;
-		}
-		if (enemyNum == 3)
-		{
-			gameWin = true;
-		}
-		
-		//temp->Update(evt,gameMap);
-		//*iter->Update(evt,gameMap);
 	}
 }
 void GameScene::updateMapGridType()
@@ -377,13 +421,18 @@ void GameScene::updatePlayerLifecycle()
 {
 	if (player->getPlayerHP() <= 0)
 	{
-		gameOver = true;
+		gameOverStream->setRepeat(false);
+		gameOverStream->setVolume(1.0);
+		gameOverStream->play();
+		showLoseState = true;
+		player->setDead();
+		mSceneMgr->getSceneNode("playerNode")->setVisible(false);
 	}
 }
 
 void GameScene::updateBonus(const Ogre::FrameEvent& evt)
 {
-	if (_canAddBonus)
+	if (_canAddBonus && (!showLoseState))
 	{
 		for (int i = 0; i<MAP_WIDTH;i++)
 		{
@@ -427,5 +476,60 @@ void GameScene::updateBonusDuration(const Ogre::FrameEvent& evt)
 			_canAddBonus = true;
 			_addBonusDuration = 20.0;
 		}
+	}
+}
+
+void GameScene::updateWinState(const Ogre::FrameEvent& evt)
+{
+	if (showWinState)
+	{
+		gameMap->setParticleEffectAtGrid(player->getPlayerXPos(),player->getPlayerYPos(),evt,PARTICLE_WIN);
+		_gameWinDuration -= evt.timeSinceLastFrame;
+		if (_gameWinDuration <= 0)
+		{
+			gameWin = true;
+			showWinState = false;
+			_gameWinDuration = 5.0;
+		}
+	}
+	else if (showLoseState)
+	{
+		gameMap->setParticleEffectAtGrid(player->getPlayerXPos(),player->getPlayerYPos(),evt,PARTICLE_LOSE);
+		_gameOverDuration -= evt.timeSinceLastFrame;
+		if (_gameOverDuration <= 0)
+		{
+			gameOver = true;
+			showLoseState = false;
+			_gameOverDuration = 5.0;
+		}
+	}
+}
+
+void GameScene::updatePlayerLifeDisplay()
+{
+	int num=player->getPlayerHP();
+	num=3-num;
+
+	//all true
+	std::vector<Ogre::SceneNode*>::iterator iter=playerLifeList.begin();
+
+	for(;iter!=playerLifeList.end();iter++)
+	{
+		Ogre::SceneNode* temp=*iter;
+		temp->setVisible(true);
+	}
+
+	//
+	iter=playerLifeList.begin();
+
+	for(;iter!=playerLifeList.end();iter++)
+	{
+		if(num<=0)
+		{
+			break;
+		}
+		Ogre::SceneNode* temp=*iter;
+		temp->setVisible(false);
+		num--;
 	}
 }

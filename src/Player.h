@@ -26,6 +26,7 @@ public:
 	int getPlayerYPos();
 	directionType getPlayerDirection();
 	int getPlayerHP();
+	void setDead();
 	void updatePlayerWithGrid(const Ogre::FrameEvent& evt, GameMap* gameMap);
 	//properties
 	gridType _currentGridType;

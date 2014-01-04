@@ -42,6 +42,7 @@ public:
 
 	std::map<int, Bomb> bombPool;
 	std::vector<EnemyAI*>enemyList;
+	std::vector<Ogre::SceneNode*>playerLifeList;
 	bool isSpaceKeyDown;
 
 	void initGameData(void);
@@ -51,6 +52,8 @@ public:
 	void createScene(void);
 	bool gameOver;
 	bool gameWin;
+	bool showWinState;
+	bool showLoseState;
 	void Update(const Ogre::FrameEvent& evt);
 
 
@@ -64,6 +67,8 @@ private:
 	int bombIndex;
 	float _addBonusDuration;
 	bool _canAddBonus;
+	float _gameWinDuration;
+	float _gameOverDuration;
 
 	Ogre::Vector3 getWorldCoord(Ogre::Vector2 pos, float yPos);
 
@@ -73,7 +78,8 @@ private:
 	void updatePlayerLifecycle();
 	void updateBonus(const Ogre::FrameEvent& evt);
 	void updateBonusDuration(const Ogre::FrameEvent& evt);
-	void updateCalculateWinDuration(const Ogre::FrameEvent& evt);
+	void updateWinState(const Ogre::FrameEvent& evt);
+	void updatePlayerLifeDisplay();
 };
 
 #endif

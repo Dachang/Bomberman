@@ -1,5 +1,8 @@
 #include "GameBomb.h"
 
+audiere::AudioDevicePtr device2(audiere::OpenDevice());
+audiere::OutputStreamPtr bombExplodeStream(audiere::OpenSound(device2,"Resources/Sound/explode.wav",false));
+
 GameBomb::GameBomb(Ogre::Entity* entity,Ogre::SceneNode* node,Ogre::SceneManager *sceneMgr,Ogre::Camera *camera,OIS::Keyboard *keyboard,int BombLevel=3)
 	:GameObject(entity,node,sceneMgr,camera,keyboard)
 {
@@ -60,8 +63,11 @@ void GameBomb::calculateDuration(const Ogre::FrameEvent& evt)
 
 void GameBomb::explode(GameMap* map,const Ogre::FrameEvent& evt)
 {
+	bombExplodeStream->setRepeat(false);
+	bombExplodeStream->setVolume(1.0);
+	bombExplodeStream->play();
 	map->setMapTypeAtGridPos(_bombPosition.x,_bombPosition.y,GRID_NORMAL);
-	map->setParticleEffectAtGrid(_bombPosition.x,_bombPosition.y,evt);
+	map->setParticleEffectAtGrid(_bombPosition.x,_bombPosition.y,evt,PARTICLE_BOMB);
 	expandPowerZone(map);
 }
 
