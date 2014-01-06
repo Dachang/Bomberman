@@ -70,5 +70,6 @@ private:
 	void TurnBack(GameMap* gameMap);
 	void Rotate();
 	void updateUnbreakable(const Ogre::FrameEvent& evt);
+	void playAddBonusSoundEffect();
 };
 #endif

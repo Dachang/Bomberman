@@ -1,6 +1,7 @@
 #include "Player.h"
 
-
+audiere::AudioDevicePtr device4(audiere::OpenDevice());
+audiere::OutputStreamPtr getBonusStream(audiere::OpenSound(device4,"Resources/Sound/Achievement.wav",false));
 
 Player::Player(Ogre::Entity* entity,Ogre::SceneNode* node,Ogre::SceneManager *sceneMgr,Ogre::Camera *camera,OIS::Keyboard *keyboard)
 	:GameObject(entity,node,sceneMgr, camera, keyboard)
@@ -369,6 +370,7 @@ void Player::updatePlayerWithGrid(const Ogre::FrameEvent& evt,GameMap* gameMap)
 	switch (_lastGridType)
 	{
 	case GRID_ADD_HEALTH:
+		playAddBonusSoundEffect();
 		gameMap->setMapTypeAtGridPos(_pos.x,_pos.y,GRID_NORMAL);
 		_healthValue++;
 		if(_healthValue>3)
@@ -377,6 +379,7 @@ void Player::updatePlayerWithGrid(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		}
 		break;
 	case GRID_ADD_SPEED:
+		playAddBonusSoundEffect();
 		gameMap->setMapTypeAtGridPos(_pos.x,_pos.y,GRID_NORMAL);
 		if(MOVESPEED<400)
 		{
@@ -385,6 +388,7 @@ void Player::updatePlayerWithGrid(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		
 		break;
 	case GRID_ADD_BOMB:
+		playAddBonusSoundEffect();
 		gameMap->setMapTypeAtGridPos(_pos.x,_pos.y,GRID_NORMAL);
 		_bombAvailableNumber++;
 		if(_bombAvailableNumber>8)
@@ -393,6 +397,7 @@ void Player::updatePlayerWithGrid(const Ogre::FrameEvent& evt,GameMap* gameMap)
 		}
 		break;
 	case GRID_ADD_BOMB_POWER:
+		playAddBonusSoundEffect();
 		gameMap->setMapTypeAtGridPos(_pos.x,_pos.y,GRID_NORMAL);
 		_bombLevel+=2;
 		if(_bombLevel>7)
@@ -573,4 +578,11 @@ void Player::updateUnbreakable(const Ogre::FrameEvent& evt)
 			_unbreakableDuration = 2.0;
 		}
 	}
+}
+
+void Player::playAddBonusSoundEffect()
+{
+	getBonusStream->setRepeat(false);
+	getBonusStream->setVolume(1.0);
+	getBonusStream->play();
 }

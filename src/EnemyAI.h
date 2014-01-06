@@ -50,6 +50,7 @@ private:
 	int healthValue;
 	float unbreakableDuration;
 	bool unbreakable;
+	bool hasPlayedDeadSound;
 	void UpdateUnbreakable(const Ogre::FrameEvent& evt);
 	void CheckBombCollision(GameMap* gameMap);
 	void AddBomb(GameMap* gameMap);
@@ -57,5 +58,6 @@ private:
 	std::map<int,GameBomb*> _bombList;
 	void updateMyPosition();
 	void Rotate();
+	void playEnemyDeadSound();
 };
 #endif

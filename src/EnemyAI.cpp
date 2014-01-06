@@ -1,5 +1,8 @@
 #include "EnemyAI.h"
 
+audiere::AudioDevicePtr device5(audiere::OpenDevice());
+audiere::OutputStreamPtr enemyDeadStream(audiere::OpenSound(device5,"Resources/Sound/killEnemy.wav",false));
+
 EnemyAI::EnemyAI(Ogre::Entity* entity,Ogre::SceneNode* node,Ogre::SceneManager *sceneMgr,Ogre::Camera *camera,OIS::Keyboard *keyboard)
 	:GameObject(entity,node,sceneMgr, camera, keyboard)
 {
@@ -27,6 +30,8 @@ void EnemyAI::Start(void)
 	healthValue=3;
 	unbreakable=false;
 	unbreakableDuration=0;
+
+	hasPlayedDeadSound = false;
 }
 bool EnemyAI::Update(const Ogre::FrameEvent& evt,GameMap* map)
 {
@@ -268,9 +273,12 @@ void EnemyAI::Rotate()
 }
 void EnemyAI::setVisible(bool isVisible)
 {
-
 	this->_Node->setVisible(isVisible);
-
+	if ((!isVisible) && (!hasPlayedDeadSound))
+	{
+		playEnemyDeadSound();
+		hasPlayedDeadSound = true;
+	}
 }
 void EnemyAI::setDead()
 {
@@ -310,4 +318,11 @@ Ogre::Vector2 EnemyAI::convertWorldPosToGridPos(Ogre::Vector3 pos)
 	//rtn.x =  int((pos.x-60)/120+0.5) + 12;
 	//rtn.y = int((pos.z-60)/120+0.5) + 10;
 	return rtn;
+}
+
+void EnemyAI::playEnemyDeadSound()
+{
+	enemyDeadStream->setRepeat(false);
+	enemyDeadStream->setVolume(1.0);
+	enemyDeadStream->play();
 }

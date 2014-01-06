@@ -3,6 +3,7 @@
 float winTime = 0;
 audiere::AudioDevicePtr device3(audiere::OpenDevice());
 audiere::OutputStreamPtr gameOverStream(audiere::OpenSound(device3,"Resources/Sound/gameover.wav",false));
+audiere::OutputStreamPtr gameWinStream(audiere::OpenSound(device3,"Resources/Sound/win.wav",false));
 
 GameScene::GameScene(void)
 {
@@ -14,7 +15,7 @@ GameScene::GameScene(void)
 	gameWin = false;
 	_addBonusDuration = 20.0;
 	_canAddBonus = true;
-	_gameWinDuration = 3.0;
+	_gameWinDuration = 9.0;
 	_gameOverDuration = 3.0;
 	showWinState = false;
 	showLoseState = false;
@@ -311,7 +312,7 @@ void GameScene::Update(const Ogre::FrameEvent& evt)
 
 	updateBonus(evt);
 
-	updateWinState(evt);
+	updateGameState(evt);
 }
 
 Ogre::Vector3 GameScene::getWorldCoord(Ogre::Vector2 pos, float yPos)
@@ -365,6 +366,9 @@ void GameScene::updateEnemyList(const Ogre::FrameEvent& evt,GameMap* gameMap)
 			}
 			if (enemyNum == 3)
 			{
+				gameWinStream->setRepeat(false);
+				gameWinStream->setVolume(1.0);
+				gameWinStream->play();
 				showWinState = true;
 			}
 			
@@ -479,7 +483,7 @@ void GameScene::updateBonusDuration(const Ogre::FrameEvent& evt)
 	}
 }
 
-void GameScene::updateWinState(const Ogre::FrameEvent& evt)
+void GameScene::updateGameState(const Ogre::FrameEvent& evt)
 {
 	if (showWinState)
 	{

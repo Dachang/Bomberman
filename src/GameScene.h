@@ -78,7 +78,7 @@ private:
 	void updatePlayerLifecycle();
 	void updateBonus(const Ogre::FrameEvent& evt);
 	void updateBonusDuration(const Ogre::FrameEvent& evt);
-	void updateWinState(const Ogre::FrameEvent& evt);
+	void updateGameState(const Ogre::FrameEvent& evt);
 	void updatePlayerLifeDisplay();
 };
 

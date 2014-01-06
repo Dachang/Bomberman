@@ -5,7 +5,8 @@
 #include <RTShaderSystem/OgreRTShaderSystem.h>
 
 audiere::AudioDevicePtr device(audiere::OpenDevice());
-audiere::OutputStreamPtr bgStream(audiere::OpenSound(device,"Resources/Sound/bg.wav",false));
+audiere::OutputStreamPtr bgStream(audiere::OpenSound(device,"Resources/Sound/JingleLoop03.wav",false));
+audiere::OutputStreamPtr menubgStream(audiere::OpenSound(device,"Resources/Sound/menu.wav",false));
 
 OgreFramework::OgreFramework(void)
 	:mRoot(0),
@@ -187,6 +188,9 @@ void OgreFramework::logicalFrameFunc(const Ogre::FrameEvent& evt)
 	case MENUSCENE:
 		{
 			bgStream->stop();
+			menubgStream->setRepeat(true);
+			menubgStream->setVolume(1.0);
+			menubgStream->play();
 			if (mKeyboard->isKeyDown(OIS::KC_RETURN)){
 				gameStart();
 				return;
@@ -197,6 +201,7 @@ void OgreFramework::logicalFrameFunc(const Ogre::FrameEvent& evt)
 		}
 	case GAMESCENE:
 		{	
+			menubgStream->stop();
 			if (gameScene.showLoseState)
 			{
 				bgStream->stop();
